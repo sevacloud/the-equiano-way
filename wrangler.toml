@@ -1,0 +1,7 @@
+name = "equiano-way"
+pages_build_output_dir = "public"
+compatibility_date = "2026-01-01"
+
+[[kv_namespaces]]
+binding = "REPORT_FALLBACK"
+id = "5f81e7c9bc4d4ccb8744aa39a0d46ece"
