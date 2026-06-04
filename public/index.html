@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Equiano Way</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+
+/* ── Reset & base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal:        #1A6B5F;
+  --teal-dark:   #0F3F37;
+  --teal-light:  #E8F4F2;
+  --gold:        #C49A2E;
+  --gold-dark:   #8B6914;
+  --gold-light:  #F5E6C0;
+  --parchment:   #F2EDE3;
+  --parchment-2: #E8E0D0;
+  --ink:         #1C1813;
+  --ink-light:   #3D3428;
+  --stone:       #7A7060;
+  --stone-light: #A89F90;
+  --rust:        #8B3A2A;
+
+  --font-display: 'Cinzel', serif;
+  --font-body:    'Cormorant Garamond', serif;
+  --font-reading: 'Crimson Pro', serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--parchment);
+  color: var(--ink);
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ── Noise texture overlay ─────────────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.6;
+}
+
+/* ── Nav ───────────────────────────────────────────────────────────────────── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1.25rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(28,24,19,0.7) 0%, transparent 100%);
+  backdrop-filter: blur(0px);
+}
+
+.nav-wordmark {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.25em;
+  color: var(--parchment);
+  text-transform: uppercase;
+  opacity: 0;
+  animation: fadeIn 1s ease 1.5s forwards;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  opacity: 0;
+  animation: fadeIn 1s ease 1.8s forwards;
+}
+
+.nav-links a {
+  font-family: var(--font-reading);
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  color: var(--parchment);
+  text-decoration: none;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.nav-links a:hover { opacity: 1; }
+
+/* ── Hero ──────────────────────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--teal-dark);
+}
+
+/* Layered background — aged map feel */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 30% 50%, rgba(196,154,46,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 70% 30%, rgba(26,107,95,0.15) 0%, transparent 60%),
+    linear-gradient(160deg, #0F2B26 0%, #1A3D35 30%, #0D2820 60%, #0A1F1A 100%);
+}
+
+/* SVG route line drawn across hero */
+.hero-route {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  animation: fadeIn 2s ease 0.5s forwards;
+}
+
+.route-path {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: drawRoute 3s ease-out 0.8s forwards;
+  opacity: 0.35;
+}
+
+.route-dot-start,
+.route-dot-end {
+  fill: var(--gold);
+  opacity: 0;
+}
+
+.route-dot-start { animation: popIn 0.4s ease 0.8s forwards; }
+.route-dot-end   { animation: popIn 0.4s ease 3.6s forwards; }
+
+/* Topographic rings — decorative */
+.topo-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(196,154,46,0.08);
+  pointer-events: none;
+}
+.topo-1 { width: 600px; height: 600px; top: -200px; right: -100px; }
+.topo-2 { width: 900px; height: 900px; top: -350px; right: -250px; }
+.topo-3 { width: 1200px; height: 1200px; top: -500px; right: -400px; }
+.topo-4 { width: 400px; height: 400px; bottom: -100px; left: -150px; }
+.topo-5 { width: 700px; height: 700px; bottom: -250px; left: -300px; }
+
+/* Hero content */
+.hero-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 2rem;
+  max-width: 800px;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-reading);
+  font-size: 0.75rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0;
+  animation: slideUp 0.8s ease 1.2s forwards;
+  margin-bottom: 1.25rem;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  color: var(--parchment);
+  opacity: 0;
+  animation: slideUp 0.9s ease 1.4s forwards;
+  margin-bottom: 0.5rem;
+}
+
+.hero-title-the {
+  display: block;
+  font-size: 0.35em;
+  letter-spacing: 0.5em;
+  color: var(--gold-light);
+  margin-bottom: 0.25em;
+  opacity: 0.8;
+}
+
+.hero-rule {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  margin: 1.5rem auto;
+  opacity: 0;
+  animation: fadeIn 0.8s ease 1.9s forwards;
+}
+
+.hero-subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2.5vw, 1.35rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--parchment);
+  opacity: 0;
+  animation: slideUp 0.8s ease 2s forwards;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.hero-distance {
+  font-family: var(--font-reading);
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--stone-light);
+  opacity: 0;
+  animation: fadeIn 0.8s ease 2.3s forwards;
+  margin-bottom: 2.5rem;
+}
+
+/* CTA button */
+.btn-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--gold);
+  border: none;
+  padding: 1rem 2.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  animation: slideUp 0.8s ease 2.5s forwards;
+  transition: background 0.3s, transform 0.2s;
+  min-height: 44px; /* WCAG touch target */
+}
+
+.btn-start::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.15);
+  transform: translateX(-100%);
+  transition: transform 0.4s ease;
+}
+
+.btn-start:hover::before { transform: translateX(0); }
+.btn-start:hover { transform: translateY(-1px); }
+.btn-start:focus-visible {
+  outline: 3px solid var(--gold-light);
+  outline-offset: 3px;
+}
+
+.btn-arrow {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s;
+}
+.btn-start:hover .btn-arrow { transform: translateX(4px); }
+
+/* Secondary link */
+.hero-secondary {
+  display: block;
+  margin-top: 1.25rem;
+  font-family: var(--font-reading);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  color: var(--stone-light);
+  text-decoration: none;
+  opacity: 0;
+  animation: fadeIn 0.8s ease 2.8s forwards;
+  transition: color 0.2s;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.hero-secondary:hover { color: var(--parchment); }
+
+/* Scroll indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0;
+  animation: fadeIn 1s ease 3.2s forwards;
+}
+
+.scroll-label {
+  font-family: var(--font-reading);
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--stone-light);
+}
+
+.scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--stone-light), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+/* Route waypoints strip */
+.hero-waypoints {
+  position: absolute;
+  bottom: 0;
+  left: 0; right: 0;
+  padding: 1rem 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeIn 1s ease 3s forwards;
+}
+
+.waypoint-item {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.waypoint-name {
+  font-family: var(--font-reading);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--stone-light);
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+.waypoint-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, rgba(122,112,96,0.4), rgba(122,112,96,0.15));
+  margin: 0 0.5rem;
+  min-width: 20px;
+}
+
+.waypoint-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.waypoint-dot.first,
+.waypoint-dot.last {
+  opacity: 1;
+  width: 7px;
+  height: 7px;
+  box-shadow: 0 0 8px rgba(196,154,46,0.6);
+}
+
+/* ── Section: About ────────────────────────────────────────────────────────── */
+.section-about {
+  background: var(--parchment);
+  padding: 7rem 2.5rem;
+  position: relative;
+}
+
+.section-about::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--parchment-2), transparent);
+}
+
+.about-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: start;
+}
+
+.about-label {
+  font-family: var(--font-reading);
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 1.5rem;
+}
+
+.about-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 2rem;
+  letter-spacing: 0.03em;
+}
+
+.about-body {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--ink-light);
+  margin-bottom: 1.25rem;
+}
+
+.about-quote {
+  border-left: 2px solid var(--gold);
+  padding: 1rem 0 1rem 1.5rem;
+  margin: 2rem 0;
+}
+
+.about-quote p {
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--gold-dark);
+}
+
+.about-quote cite {
+  display: block;
+  margin-top: 0.75rem;
+  font-family: var(--font-reading);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--stone);
+  font-style: normal;
+}
+
+/* Stats panel */
+.about-stats {
+  background: var(--teal-dark);
+  padding: 3rem 2.5rem;
+  position: relative;
+}
+
+.about-stats::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  right: 0; bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.stat-item {
+  padding: 1.75rem 0;
+  border-bottom: 1px solid rgba(242,237,227,0.1);
+}
+.stat-item:last-child { border-bottom: none; }
+
+.stat-number {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 400;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-family: var(--font-reading);
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--parchment);
+  opacity: 0.6;
+}
+
+.stat-desc {
+  margin-top: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--parchment);
+  opacity: 0.5;
+  line-height: 1.5;
+}
+
+/* ── Section: Route ────────────────────────────────────────────────────────── */
+.section-route {
+  background: var(--ink);
+  padding: 7rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.section-route::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(26,107,95,0.12) 0%, transparent 70%);
+}
+
+.route-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.section-label {
+  font-family: var(--font-reading);
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.section-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 400;
+  color: var(--parchment);
+  text-align: center;
+  margin-bottom: 4rem;
+  letter-spacing: 0.05em;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1px;
+  background: rgba(242,237,227,0.06);
+}
+
+.day-card {
+  background: rgba(15,39,35,0.5);
+  padding: 1.75rem;
+  position: relative;
+  transition: background 0.3s;
+  cursor: default;
+}
+
+.day-card:hover { background: rgba(26,107,95,0.2); }
+
+.day-number {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+}
+
+.day-route {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--parchment);
+  margin-bottom: 0.4rem;
+  line-height: 1.4;
+}
+
+.day-miles {
+  font-family: var(--font-reading);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--stone-light);
+  margin-bottom: 0.75rem;
+}
+
+.day-theme {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--stone-light);
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+.day-card.alt {
+  border-left: 2px solid rgba(196,154,46,0.3);
+}
+
+/* ── Section: Equiano ──────────────────────────────────────────────────────── */
+.section-equiano {
+  background: var(--parchment-2);
+  padding: 7rem 2.5rem;
+  position: relative;
+}
+
+.equiano-inner {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.equiano-ornament {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  color: var(--teal);
+  opacity: 0.15;
+  line-height: 1;
+  margin-bottom: 1rem;
+  letter-spacing: 0.1em;
+}
+
+.equiano-name {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 400;
+  color: var(--teal-dark);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.equiano-dates {
+  font-family: var(--font-reading);
+  font-size: 0.75rem;
+  letter-spacing: 0.35em;
+  color: var(--stone);
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+}
+
+.equiano-body {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--ink-light);
+  text-align: left;
+  margin-bottom: 1.25rem;
+}
+
+.equiano-pullquote {
+  margin: 3rem 0;
+  padding: 2rem;
+  background: var(--teal-dark);
+  position: relative;
+}
+
+.equiano-pullquote::before {
+  content: '\201C';
+  font-family: var(--font-display);
+  font-size: 6rem;
+  line-height: 0.7;
+  color: var(--gold);
+  opacity: 0.3;
+  position: absolute;
+  top: 1rem;
+  left: 1.5rem;
+}
+
+.equiano-pullquote p {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--parchment);
+  line-height: 1.75;
+  position: relative;
+  z-index: 1;
+  padding-left: 1rem;
+}
+
+.equiano-pullquote cite {
+  display: block;
+  margin-top: 1rem;
+  font-family: var(--font-reading);
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-style: normal;
+  opacity: 0.8;
+  padding-left: 1rem;
+}
+
+/* ── Section: CTA ──────────────────────────────────────────────────────────── */
+.section-cta {
+  background: var(--teal-dark);
+  padding: 7rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.section-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 50% 50%, rgba(196,154,46,0.07) 0%, transparent 70%);
+}
+
+.cta-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.cta-heading {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 400;
+  color: var(--parchment);
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.05em;
+}
+
+.cta-sub {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--parchment);
+  opacity: 0.65;
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--gold);
+  border: none;
+  padding: 1.1rem 3rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.3s, transform 0.2s;
+  min-height: 44px;
+}
+.btn-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+.btn-cta:focus-visible { outline: 3px solid var(--gold-light); outline-offset: 3px; }
+
+.cta-note {
+  margin-top: 1.5rem;
+  font-family: var(--font-reading);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--stone-light);
+  opacity: 0.6;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────────── */
+footer {
+  background: var(--ink);
+  padding: 3rem 2.5rem;
+  border-top: 1px solid rgba(196,154,46,0.15);
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-wordmark {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  color: var(--parchment);
+  opacity: 0.4;
+  text-transform: uppercase;
+}
+
+.footer-credit {
+  font-family: var(--font-reading);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: var(--stone);
+  opacity: 0.5;
+}
+
+/* ── Animations ────────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes drawRoute {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0); }
+  70%  { transform: scale(1.4); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50%       { opacity: 0.8; transform: scaleY(1.15); }
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.25rem; }
+  .nav-links { display: none; }
+
+  .hero-waypoints { display: none; }
+
+  .about-inner {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .days-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* ── Skip link (accessibility) ─────────────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  background: var(--gold);
+  color: var(--ink);
+  padding: 0.75rem 1.25rem;
+  font-family: var(--font-reading);
+  font-size: 0.9rem;
+  z-index: 9999;
+  transition: top 0.2s;
+}
+.skip-link:focus { top: 1rem; }
+
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<!-- Nav -->
+<nav aria-label="Main navigation">
+  <span class="nav-wordmark">The Equiano Way</span>
+  <ul class="nav-links">
+    <li><a href="#route">The Route</a></li>
+    <li><a href="#equiano">Olaudah Equiano</a></li>
+    <li><a href="#walk">Start Walking</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section class="hero" aria-label="Hero">
+  <div class="hero-bg"></div>
+
+  <!-- Topographic rings -->
+  <div class="topo-ring topo-1" aria-hidden="true"></div>
+  <div class="topo-ring topo-2" aria-hidden="true"></div>
+  <div class="topo-ring topo-3" aria-hidden="true"></div>
+  <div class="topo-ring topo-4" aria-hidden="true"></div>
+  <div class="topo-ring topo-5" aria-hidden="true"></div>
+
+  <!-- Animated route SVG -->
+  <svg class="hero-route" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path class="route-path"
+      d="M 180,720
+         C 200,700 220,680 260,650
+         L 320,600
+         C 360,565 400,545 440,520
+         L 480,490
+         C 520,460 540,430 560,400
+         L 580,370
+         C 610,330 650,300 700,270
+         L 740,245
+         C 780,220 810,200 850,180
+         L 900,155
+         C 940,132 980,118 1020,108
+         L 1080,95
+         C 1130,82 1180,78 1230,80
+         L 1290,90
+         Q 1340,98 1360,112
+         L 1380,130"
+    />
+    <!-- Sheffield start -->
+    <circle class="route-dot-start" cx="178" cy="722" r="5"/>
+    <circle cx="178" cy="722" r="12" fill="none" stroke="#C49A2E" stroke-width="1" opacity="0" style="animation: fadeIn 0.5s ease 1.2s forwards;"/>
+    <!-- Hull end -->
+    <circle class="route-dot-end" cx="1382" cy="128" r="5"/>
+    <circle cx="1382" cy="128" r="12" fill="none" stroke="#C49A2E" stroke-width="1" opacity="0" style="animation: fadeIn 0.5s ease 3.8s forwards;"/>
+
+    <!-- Waypoint dots along route -->
+    <g opacity="0" style="animation: fadeIn 1s ease 3s forwards;">
+      <circle cx="350" cy="614" r="3" fill="#C49A2E" opacity="0.5"/>
+      <circle cx="530" cy="412" r="3" fill="#C49A2E" opacity="0.5"/>
+      <circle cx="695" cy="272" r="3" fill="#C49A2E" opacity="0.5"/>
+      <circle cx="850" cy="182" r="3" fill="#C49A2E" opacity="0.5"/>
+      <circle cx="1020" cy="110" r="3" fill="#C49A2E" opacity="0.5"/>
+      <circle cx="1180" cy="80" r="3" fill="#C49A2E" opacity="0.5"/>
+    </g>
+
+    <!-- Labels -->
+    <g font-family="'Cinzel', serif" opacity="0" style="animation: fadeIn 1s ease 3.4s forwards;">
+      <text x="148" y="748" font-size="9" fill="#C49A2E" opacity="0.7" letter-spacing="1">SHEFFIELD</text>
+      <text x="1350" y="150" font-size="9" fill="#C49A2E" opacity="0.7" letter-spacing="1">HULL</text>
+    </g>
+  </svg>
+
+  <!-- Main content -->
+  <div class="hero-content" id="main">
+    <p class="hero-eyebrow">A Pilgrimage of Heritage &amp; Legacy</p>
+
+    <h1 class="hero-title">
+      <span class="hero-title-the">The</span>
+      Equiano<br>Way
+    </h1>
+
+    <div class="hero-rule" aria-hidden="true"></div>
+
+    <p class="hero-subtitle">
+      80 miles from Sheffield to Hull — walking the story<br>
+      of faith, freedom and the fight to abolish slavery
+    </p>
+
+    <p class="hero-distance">80 miles &nbsp;·&nbsp; 7 or 8 days &nbsp;·&nbsp; Wincobank to Wilberforce House</p>
+
+    <a href="map.html" class="btn-start" id="walk">
+      Start Walking
+      <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+
+    <a href="#route" class="hero-secondary">Explore the route ↓</a>
+  </div>
+
+  <!-- Waypoints strip -->
+  <div class="hero-waypoints" aria-hidden="true">
+    <div class="waypoint-item">
+      <div class="waypoint-dot first"></div>
+      <div class="waypoint-line"></div>
+      <span class="waypoint-name">Wincobank</span>
+      <div class="waypoint-line"></div>
+      <div class="waypoint-dot"></div>
+      <div class="waypoint-line"></div>
+      <span class="waypoint-name">Roche Abbey</span>
+      <div class="waypoint-line"></div>
+      <div class="waypoint-dot"></div>
+      <div class="waypoint-line"></div>
+      <span class="waypoint-name">Austerfield</span>
+      <div class="waypoint-line"></div>
+      <div class="waypoint-dot"></div>
+      <div class="waypoint-line"></div>
+      <span class="waypoint-name">Epworth</span>
+      <div class="waypoint-line"></div>
+      <div class="waypoint-dot"></div>
+      <div class="waypoint-line"></div>
+      <span class="waypoint-name">Scunthorpe</span>
+      <div class="waypoint-line"></div>
+      <div class="waypoint-dot"></div>
+      <div class="waypoint-line"></div>
+      <span class="waypoint-name">South Ferriby</span>
+      <div class="waypoint-line"></div>
+      <div class="waypoint-dot last"></div>
+      <div class="waypoint-line"></div>
+      <span class="waypoint-name">Hull</span>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="scroll-indicator" aria-hidden="true">
+    <span class="scroll-label">Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- About -->
+<section class="section-about" aria-labelledby="about-heading">
+  <div class="about-inner">
+    <div>
+      <p class="about-label">Named for a man who walked to freedom</p>
+      <h2 class="about-heading" id="about-heading">A route woven from stories of faith and resistance</h2>
+
+      <p class="about-body">The Equiano Way is not simply a walking trail. It is a pilgrimage — a journey of significance that gives rise to reflection, and not least spiritual contemplation.</p>
+
+      <p class="about-body">The route is named after Olaudah Equiano, born a prince in Nigeria, kidnapped into the transatlantic slave trade, who bought his own freedom and became one of the most important voices in the campaign for abolition. The book he wrote — his own story — is said to be the one John Wesley was reading on his deathbed.</p>
+
+      <div class="about-quote">
+        <p>Pilgrimage is far more than making a physical journey. It is being prepared to allow that restlessness, which is in every human soul, to entice us away from our security in search of something deeper.</p>
+        <cite>— Canon Stephen Shipley</cite>
+      </div>
+
+      <p class="about-body">Each place the route passes through has earned its position — from Wincobank's abolitionist halls to Austerfield's Pilgrim Fathers, from Wesley's Epworth to Wilberforce's Hull.</p>
+    </div>
+
+    <div>
+      <div class="about-stats">
+        <div class="stat-item">
+          <div class="stat-number">80</div>
+          <div class="stat-label">Miles</div>
+          <div class="stat-desc">Sheffield to Hull, across South Yorkshire, North Lincolnshire, and East Yorkshire</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">7–8</div>
+          <div class="stat-label">Days</div>
+          <div class="stat-desc">With a choice of route at Day 6 — via the direct path or Julian's Bower at Alkborough</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">9</div>
+          <div class="stat-label">Sections</div>
+          <div class="stat-desc">Each one connected to a place, a person, and a chapter in the story of faith and freedom</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">1789</div>
+          <div class="stat-label">Equiano's Narrative</div>
+          <div class="stat-desc">Published and promoted across Britain — the book that changed minds and shaped history</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Route -->
+<section class="section-route" id="route" aria-labelledby="route-heading">
+  <div class="route-inner">
+    <p class="section-label">The Journey</p>
+    <h2 class="section-heading" id="route-heading">Day by Day</h2>
+
+    <div class="days-grid" role="list">
+
+      <div class="day-card" role="listitem">
+        <div class="day-number">Day 1</div>
+        <div class="day-route">Wincobank Chapel → Whiston</div>
+        <div class="day-miles">7.4 miles</div>
+        <div class="day-theme">Equiano's Sheffield visit; the abolitionist roots of Wincobank Hall</div>
+      </div>
+
+      <div class="day-card" role="listitem">
+        <div class="day-number">Day 2</div>
+        <div class="day-route">Whiston → Roche Abbey</div>
+        <div class="day-miles">8.2 miles</div>
+        <div class="day-theme">Emerging from the industrial suburbs into the quiet of a woodland valley</div>
+      </div>
+
+      <div class="day-card" role="listitem">
+        <div class="day-number">Day 3</div>
+        <div class="day-route">Roche Abbey → Austerfield</div>
+        <div class="day-miles">10.9 miles</div>
+        <div class="day-theme">The Pilgrim Fathers — where the search for religious freedom began</div>
+      </div>
+
+      <div class="day-card" role="listitem">
+        <div class="day-number">Day 4</div>
+        <div class="day-route">Austerfield → Epworth</div>
+        <div class="day-miles">13.2 miles</div>
+        <div class="day-theme">John Wesley's country — along waterways to the home of Methodism</div>
+      </div>
+
+      <div class="day-card" role="listitem">
+        <div class="day-number">Day 5</div>
+        <div class="day-route">Epworth → Scunthorpe</div>
+        <div class="day-miles">11.1 miles</div>
+        <div class="day-theme">Wesley's villages and Salim C Wilson — freed slave turned evangelist</div>
+      </div>
+
+      <div class="day-card alt" role="listitem">
+        <div class="day-number">Day 6a — Direct</div>
+        <div class="day-route">Scunthorpe → South Ferriby</div>
+        <div class="day-miles">12.5 miles</div>
+        <div class="day-theme">Through Normanby Hall and along the approach to the vast River Humber</div>
+      </div>
+
+      <div class="day-card alt" role="listitem">
+        <div class="day-number">Day 6b — Alternative</div>
+        <div class="day-route">Scunthorpe → Alkborough</div>
+        <div class="day-miles">7.7 miles</div>
+        <div class="day-theme">North along the River Trent to Julian's Bower — an ancient turf labyrinth</div>
+      </div>
+
+      <div class="day-card alt" role="listitem">
+        <div class="day-number">Day 7b</div>
+        <div class="day-route">Alkborough → South Ferriby</div>
+        <div class="day-miles">9.3 miles</div>
+        <div class="day-theme">Along the Humber bank past the Roman settlement at Eastfield</div>
+      </div>
+
+      <div class="day-card" role="listitem">
+        <div class="day-number">Day 7 or 8</div>
+        <div class="day-route">South Ferriby → Hull</div>
+        <div class="day-miles">12.1 miles</div>
+        <div class="day-theme">Across the Humber Bridge to Wilberforce House — journey's end</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Equiano -->
+<section class="section-equiano" aria-labelledby="equiano-heading">
+  <div class="equiano-inner">
+    <div class="equiano-ornament" aria-hidden="true">✦</div>
+    <h2 class="equiano-name" id="equiano-heading">Olaudah Equiano</h2>
+    <p class="equiano-dates">c. 1745 — 1797</p>
+
+    <p class="equiano-body">Born a prince in what is now south-eastern Nigeria, Equiano was kidnapped as a child and sold into the transatlantic slave trade. He endured the Middle Passage and years of servitude before buying his own freedom in 1766.</p>
+
+    <p class="equiano-body">After settling in Britain, he became a central figure in the abolitionist movement — co-founding the Sons of Africa, working alongside Granville Sharp, and writing the autobiography that would shape public opinion across the country.</p>
+
+    <div class="equiano-pullquote">
+      <p>Go on, in the name of God and in the power of His might, till even American slavery (the vilest that ever saw the sun) shall vanish away before it.</p>
+      <cite>John Wesley, to William Wilberforce — 24 February 1791</cite>
+    </div>
+
+    <p class="equiano-body">It is said that Wesley was reading Equiano's autobiography on his deathbed. Days later he wrote his final letter — to William Wilberforce. The thread from Equiano's pen to Wilberforce's campaign runs directly through this landscape.</p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section-cta" aria-labelledby="cta-heading">
+  <div class="cta-inner">
+    <h2 class="cta-heading" id="cta-heading">Ready to Begin?</h2>
+    <p class="cta-sub">Open the map, find where you are, and let the stories of the route meet you where you stand.</p>
+    <a href="map.html" class="btn-cta">
+      Open the Map
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <p class="cta-note">No app download required &nbsp;·&nbsp; Works in your browser &nbsp;·&nbsp; Free to use</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <span class="footer-wordmark">The Equiano Way</span>
+    <span class="footer-credit">Managed by The Epworth Rectory &nbsp;·&nbsp; May 2026</span>
+  </div>
+</footer>
+
+</body>
+</html>

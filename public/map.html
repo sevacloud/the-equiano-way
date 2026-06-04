@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>The Equiano Way — Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+
+/* ── Reset ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal:        #1A6B5F;
+  --teal-dark:   #0F3F37;
+  --teal-light:  #E8F4F2;
+  --gold:        #C49A2E;
+  --gold-dark:   #8B6914;
+  --gold-light:  #F5E6C0;
+  --parchment:   #F2EDE3;
+  --parchment-2: #E8E0D0;
+  --ink:         #1C1813;
+  --ink-light:   #3D3428;
+  --stone:       #7A7060;
+  --stone-light: #A89F90;
+  --white:       #FFFFFF;
+
+  --font-display: 'Cinzel', serif;
+  --font-body:    'Cormorant Garamond', serif;
+  --font-reading: 'Crimson Pro', serif;
+
+  --drawer-peek: 120px;   /* how much of the drawer peeks above fold */
+  --nav-h:       56px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-body);
+  background: var(--ink);
+  color: var(--ink);
+}
+
+/* ── Skip link ─────────────────────────────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%; left: 1rem;
+  background: var(--gold);
+  color: var(--ink);
+  padding: 0.75rem 1.25rem;
+  font-family: var(--font-reading);
+  font-size: 0.9rem;
+  z-index: 9999;
+}
+.skip-link:focus { top: 1rem; }
+
+/* ── Top nav bar ───────────────────────────────────────────────────────────── */
+.top-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  background: rgba(15, 39, 35, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(196,154,46,0.2);
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--parchment);
+  border-radius: 2px;
+  transition: background 0.2s;
+  text-decoration: none;
+}
+.btn-back:hover { background: rgba(242,237,227,0.1); }
+.btn-back:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.top-wordmark {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--parchment);
+  opacity: 0.8;
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Section pill */
+.section-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(196,154,46,0.15);
+  border: 1px solid rgba(196,154,46,0.35);
+  padding: 0.35rem 0.75rem;
+  border-radius: 100px;
+}
+
+.section-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.section-pill-text {
+  font-family: var(--font-reading);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+}
+
+/* Icon buttons */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(242,237,227,0.08);
+  border: 1px solid rgba(242,237,227,0.12);
+  border-radius: 2px;
+  cursor: pointer;
+  color: var(--parchment);
+  transition: background 0.2s;
+}
+.icon-btn:hover   { background: rgba(242,237,227,0.15); }
+.icon-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.icon-btn svg { flex-shrink: 0; }
+
+/* ── Map container ─────────────────────────────────────────────────────────── */
+#map {
+  position: fixed;
+  inset: 0;
+  top: var(--nav-h);
+  bottom: var(--drawer-peek);
+  z-index: 1;
+}
+
+/* Override Leaflet defaults for heritage feel */
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.leaflet-control-zoom a {
+  background: rgba(15,39,35,0.92) !important;
+  backdrop-filter: blur(8px) !important;
+  color: var(--parchment) !important;
+  border: 1px solid rgba(196,154,46,0.25) !important;
+  width: 44px !important;
+  height: 44px !important;
+  line-height: 44px !important;
+  font-size: 1.1rem !important;
+  border-radius: 2px !important;
+  margin-bottom: 4px !important;
+  transition: background 0.2s !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: rgba(26,107,95,0.7) !important;
+  color: var(--parchment) !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(15,39,35,0.7) !important;
+  color: var(--stone-light) !important;
+  font-size: 0.6rem !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+.leaflet-control-attribution a { color: var(--gold) !important; }
+
+/* ── GPS locate button ─────────────────────────────────────────────────────── */
+.btn-locate {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(var(--drawer-peek) + 1rem);
+  z-index: 200;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(15,39,35,0.95);
+  border: 1px solid rgba(196,154,46,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--gold);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  transition: background 0.2s, transform 0.2s;
+  backdrop-filter: blur(8px);
+}
+.btn-locate:hover   { background: var(--teal-dark); transform: scale(1.05); }
+.btn-locate:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.btn-locate.active  { background: var(--teal); border-color: var(--gold); }
+
+/* GPS pulse ring when active */
+.btn-locate.active::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid rgba(196,154,46,0.4);
+  animation: gpsPulse 2s ease-out infinite;
+}
+
+/* ── Waypoint nearby indicator ─────────────────────────────────────────────── */
+.waypoint-alert {
+  position: fixed;
+  top: calc(var(--nav-h) + 0.75rem);
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  z-index: 250;
+  background: rgba(15,39,35,0.95);
+  border: 1px solid var(--gold);
+  padding: 0.6rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.waypoint-alert.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.waypoint-alert-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.waypoint-alert-text {
+  font-family: var(--font-reading);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+}
+
+/* ── Bottom drawer ─────────────────────────────────────────────────────────── */
+.drawer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 200;
+  background: var(--parchment);
+  border-top: 2px solid rgba(196,154,46,0.4);
+  transform: translateY(calc(100% - var(--drawer-peek)));
+  transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 88svh;
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.drawer.open {
+  transform: translateY(0);
+}
+
+/* Drag handle */
+.drawer-handle-area {
+  padding: 0.75rem 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  min-height: 44px;
+  justify-content: center;
+}
+
+.drawer-handle {
+  width: 36px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--stone-light);
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.drawer-handle-area:hover .drawer-handle { opacity: 0.8; }
+
+/* Drawer peek — always visible */
+.drawer-peek {
+  padding: 0 1.25rem 1rem;
+  flex-shrink: 0;
+}
+
+.drawer-peek-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drawer-section-label {
+  font-family: var(--font-reading);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.2rem;
+}
+
+.drawer-section-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--ink);
+  letter-spacing: 0.03em;
+}
+
+.drawer-progress-wrap {
+  text-align: right;
+}
+
+.drawer-progress-label {
+  font-family: var(--font-reading);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--stone);
+  margin-bottom: 0.35rem;
+}
+
+.progress-bar-track {
+  width: 100px;
+  height: 3px;
+  background: var(--parchment-2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-left: auto;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--teal);
+  border-radius: 2px;
+  width: 28%;
+  transition: width 0.8s ease;
+}
+
+/* Drawer scrollable content */
+.drawer-content {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0 1.25rem;
+  padding-bottom: calc(1.5rem + var(--safe-bottom));
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Waypoint cards */
+.waypoints-label {
+  font-family: var(--font-reading);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--stone);
+  margin-bottom: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--parchment-2);
+}
+
+.waypoint-card {
+  background: var(--white);
+  border: 1px solid var(--parchment-2);
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.waypoint-card:hover {
+  border-color: rgba(196,154,46,0.5);
+  box-shadow: 0 2px 12px rgba(28,24,19,0.08);
+}
+
+.waypoint-card:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.waypoint-card.active {
+  border-color: var(--gold);
+  background: var(--gold-light);
+}
+
+.waypoint-card.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--gold);
+}
+
+.waypoint-card-inner {
+  padding: 1rem 1.1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+}
+
+.waypoint-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1rem;
+  background: var(--teal-light);
+  color: var(--teal-dark);
+}
+
+.waypoint-card.active .waypoint-icon {
+  background: rgba(196,154,46,0.2);
+}
+
+.waypoint-meta { flex: 1; min-width: 0; }
+
+.waypoint-type {
+  font-family: var(--font-reading);
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--stone);
+  margin-bottom: 0.2rem;
+}
+
+.waypoint-title {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: 0.25rem;
+}
+
+.waypoint-excerpt {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--stone);
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.waypoint-distance {
+  font-family: var(--font-reading);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--stone-light);
+  white-space: nowrap;
+  margin-top: 0.1rem;
+}
+
+/* ── Story panel (full screen overlay) ────────────────────────────────────── */
+.story-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: var(--parchment);
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.story-panel.open {
+  transform: translateX(0);
+}
+
+.story-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  height: var(--nav-h);
+  background: var(--teal-dark);
+  border-bottom: 1px solid rgba(196,154,46,0.2);
+  flex-shrink: 0;
+}
+
+.story-close {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--parchment);
+  font-family: var(--font-reading);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  padding: 0.5rem;
+  min-width: 44px;
+  min-height: 44px;
+}
+.story-close:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.story-audio-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(196,154,46,0.15);
+  border: 1px solid rgba(196,154,46,0.35);
+  border-radius: 100px;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  color: var(--gold-light);
+  font-family: var(--font-reading);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  min-height: 44px;
+  transition: background 0.2s;
+}
+.story-audio-btn:hover { background: rgba(196,154,46,0.25); }
+.story-audio-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.story-audio-btn.playing { background: rgba(196,154,46,0.3); }
+
+.audio-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.audio-bar {
+  width: 3px;
+  background: var(--gold);
+  border-radius: 1px;
+  height: 4px;
+  transition: height 0.1s;
+}
+
+.story-audio-btn.playing .audio-bar:nth-child(1) { animation: audioBar 0.8s ease-in-out infinite; }
+.story-audio-btn.playing .audio-bar:nth-child(2) { animation: audioBar 0.8s ease-in-out 0.2s infinite; }
+.story-audio-btn.playing .audio-bar:nth-child(3) { animation: audioBar 0.8s ease-in-out 0.4s infinite; }
+
+.story-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.story-hero {
+  background: var(--teal-dark);
+  padding: 2.5rem 1.5rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.story-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 30% 70%, rgba(196,154,46,0.08) 0%, transparent 60%);
+}
+
+.story-type-tag {
+  font-family: var(--font-reading);
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+  position: relative;
+}
+
+.story-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  font-weight: 400;
+  color: var(--parchment);
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.story-location-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.story-location-text {
+  font-family: var(--font-reading);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--stone-light);
+}
+
+.story-body {
+  padding: 2rem 1.5rem;
+}
+
+.story-rule {
+  width: 40px;
+  height: 1px;
+  background: var(--gold);
+  margin-bottom: 1.5rem;
+  opacity: 0.6;
+}
+
+.story-text {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--ink-light);
+  margin-bottom: 1.25rem;
+}
+
+.story-pullquote {
+  border-left: 2px solid var(--gold);
+  padding: 0.75rem 0 0.75rem 1.25rem;
+  margin: 1.75rem 0;
+}
+
+.story-pullquote p {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--gold-dark);
+  line-height: 1.7;
+}
+
+.story-pullquote cite {
+  display: block;
+  margin-top: 0.5rem;
+  font-family: var(--font-reading);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--stone);
+  font-style: normal;
+}
+
+/* Practical info block */
+.practical-block {
+  background: var(--teal-light);
+  border: 1px solid rgba(26,107,95,0.2);
+  padding: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.practical-label {
+  font-family: var(--font-reading);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.practical-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(26,107,95,0.1);
+  font-family: var(--font-reading);
+  font-size: 0.9rem;
+  color: var(--ink-light);
+  line-height: 1.5;
+}
+
+.practical-item:last-child { border-bottom: none; }
+
+.practical-item-icon {
+  width: 20px;
+  flex-shrink: 0;
+  text-align: center;
+  margin-top: 0.1rem;
+}
+
+/* Story nav — prev/next */
+.story-nav {
+  display: flex;
+  gap: 1px;
+  border-top: 1px solid var(--parchment-2);
+  flex-shrink: 0;
+}
+
+.story-nav-btn {
+  flex: 1;
+  padding: 1rem;
+  background: var(--white);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-reading);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--stone);
+  transition: background 0.2s, color 0.2s;
+  min-height: 52px;
+}
+
+.story-nav-btn:hover { background: var(--teal-light); color: var(--teal); }
+.story-nav-btn:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px; }
+.story-nav-btn.primary { background: var(--teal); color: var(--parchment); }
+.story-nav-btn.primary:hover { background: var(--teal-dark); }
+
+/* ── GPS dot on map ────────────────────────────────────────────────────────── */
+.gps-dot-outer {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(26,107,95,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: gpsDot 3s ease-in-out infinite;
+}
+
+.gps-dot-inner {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--teal);
+  border: 2px solid white;
+  box-shadow: 0 0 0 0 rgba(26,107,95,0.6);
+}
+
+/* ── Animations ────────────────────────────────────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(0.85); }
+}
+
+@keyframes gpsPulse {
+  0%   { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+@keyframes gpsDot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(26,107,95,0.4); }
+  50%       { box-shadow: 0 0 0 12px rgba(26,107,95,0); }
+}
+
+@keyframes audioBar {
+  0%, 100% { height: 4px; }
+  50%       { height: 14px; }
+}
+
+/* ── Leaflet custom markers ────────────────────────────────────────────────── */
+.waypoint-marker {
+  width: 32px;
+  height: 32px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+  transition: transform 0.2s;
+}
+
+.waypoint-marker:hover {
+  transform: rotate(-45deg) scale(1.15);
+}
+
+.waypoint-marker-inner {
+  transform: rotate(45deg);
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.waypoint-marker.heritage { background: var(--teal-dark); border: 2px solid var(--gold); }
+.waypoint-marker.practical { background: rgba(15,39,35,0.9); border: 2px solid rgba(196,154,46,0.5); }
+.waypoint-marker.start     { background: var(--gold-dark); border: 2px solid var(--gold-light); }
+.waypoint-marker.end       { background: var(--rust, #8B3A2A); border: 2px solid var(--gold); }
+
+/* ── Loading state ─────────────────────────────────────────────────────────── */
+.map-loading {
+  position: fixed;
+  inset: 0;
+  top: var(--nav-h);
+  bottom: var(--drawer-peek);
+  z-index: 50;
+  background: var(--teal-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  transition: opacity 0.5s;
+}
+
+.map-loading.hidden { opacity: 0; pointer-events: none; }
+
+.loading-emblem {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+}
+
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(196,154,46,0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  font-family: var(--font-reading);
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  color: var(--stone-light);
+  text-transform: uppercase;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+</style>
+</head>
+<body>
+
+<a href="#map-content" class="skip-link">Skip to map</a>
+
+<!-- ── Top bar ───────────────────────────────────────────────────────────── -->
+<header class="top-bar" role="banner">
+  <div class="top-bar-left">
+    <a href="equiano-way-landing.html" class="btn-back" aria-label="Back to home">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M12 4L6 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <span class="top-wordmark">The Equiano Way</span>
+  </div>
+
+  <div class="top-bar-right">
+    <div class="section-pill" aria-label="Current section: Day 1, Wincobank to Whiston">
+      <div class="section-pill-dot" aria-hidden="true"></div>
+      <span class="section-pill-text">Day 1 · Wincobank</span>
+    </div>
+
+    <button class="icon-btn" aria-label="View route sections and progress">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <path d="M3 5h12M3 9h8M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- ── Map ───────────────────────────────────────────────────────────────── -->
+<main id="map-content">
+  <div id="map" role="application" aria-label="Interactive walking route map"></div>
+
+  <!-- Loading overlay -->
+  <div class="map-loading" id="mapLoading" aria-live="polite" aria-label="Loading map">
+    <span class="loading-emblem">The Equiano Way</span>
+    <div class="loading-spinner" aria-hidden="true"></div>
+    <span class="loading-text">Loading route</span>
+  </div>
+</main>
+
+<!-- ── GPS locate button ──────────────────────────────────────────────────── -->
+<button class="btn-locate" id="btnLocate" aria-label="Show my location on the map" aria-pressed="false">
+  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+    <circle cx="11" cy="11" r="3.5" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M11 2v3M11 17v3M2 11h3M17 11h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+</button>
+
+<!-- ── Waypoint nearby alert ──────────────────────────────────────────────── -->
+<div class="waypoint-alert" id="waypointAlert" role="alert" aria-live="polite">
+  <div class="waypoint-alert-dot" aria-hidden="true"></div>
+  <span class="waypoint-alert-text" id="waypointAlertText">Point of interest nearby</span>
+</div>
+
+<!-- ── Bottom drawer ──────────────────────────────────────────────────────── -->
+<div class="drawer" id="drawer" role="complementary" aria-label="Route information">
+
+  <div class="drawer-handle-area" id="drawerHandle" role="button" tabindex="0"
+    aria-expanded="false" aria-controls="drawerContent" aria-label="Show route details">
+    <div class="drawer-handle" aria-hidden="true"></div>
+  </div>
+
+  <!-- Always-visible peek content -->
+  <div class="drawer-peek">
+    <div class="drawer-peek-inner">
+      <div>
+        <div class="drawer-section-label">Currently walking</div>
+        <div class="drawer-section-name">Wincobank → Whiston</div>
+      </div>
+      <div class="drawer-progress-wrap">
+        <div class="drawer-progress-label">Day 1 progress</div>
+        <div class="progress-bar-track" role="progressbar" aria-valuenow="28" aria-valuemin="0" aria-valuemax="100" aria-label="28% of day 1 complete">
+          <div class="progress-bar-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrollable content inside drawer -->
+  <div class="drawer-content" id="drawerContent">
+
+    <p class="waypoints-label">Points of interest on this section</p>
+
+    <!-- Waypoint card — active/nearby -->
+    <div class="waypoint-card active" role="button" tabindex="0"
+      aria-label="Nearby: Wincobank Hall. Tap to read the story."
+      onclick="openStory('wincobank-hall')">
+      <div class="waypoint-card-inner">
+        <div class="waypoint-icon" aria-hidden="true">⚑</div>
+        <div class="waypoint-meta">
+          <div class="waypoint-type">Heritage · Nearby</div>
+          <div class="waypoint-title">Wincobank Hall</div>
+          <div class="waypoint-excerpt">Home of Joseph and Elizabeth Read, who hosted Equiano's Sheffield visit</div>
+        </div>
+        <div class="waypoint-distance">0.1 mi</div>
+      </div>
+    </div>
+
+    <!-- Waypoint card — heritage -->
+    <div class="waypoint-card" role="button" tabindex="0"
+      aria-label="Upper Wincobank Chapel. 0.3 miles ahead. Tap to read the story."
+      onclick="openStory('wincobank-chapel')">
+      <div class="waypoint-card-inner">
+        <div class="waypoint-icon" aria-hidden="true">✦</div>
+        <div class="waypoint-meta">
+          <div class="waypoint-type">Heritage</div>
+          <div class="waypoint-title">Upper Wincobank Chapel</div>
+          <div class="waypoint-excerpt">The starting point — an ancient hill with centuries of history below your feet</div>
+        </div>
+        <div class="waypoint-distance">0.3 mi</div>
+      </div>
+    </div>
+
+    <!-- Waypoint card — practical -->
+    <div class="waypoint-card" role="button" tabindex="0"
+      aria-label="River Rother crossing. 0.8 miles ahead. Tap for guidance."
+      onclick="openStory('rother-crossing')">
+      <div class="waypoint-card-inner">
+        <div class="waypoint-icon" aria-hidden="true">⟶</div>
+        <div class="waypoint-meta">
+          <div class="waypoint-type">Waypoint Guidance</div>
+          <div class="waypoint-title">River Rother Crossing</div>
+          <div class="waypoint-excerpt">Swing gate on the far bank — follow the waymarker post to the right</div>
+        </div>
+        <div class="waypoint-distance">0.8 mi</div>
+      </div>
+    </div>
+
+    <!-- Waypoint card — heritage -->
+    <div class="waypoint-card" role="button" tabindex="0"
+      aria-label="Sheffield Country Walk junction. 1.2 miles ahead."
+      onclick="openStory('sheffield-walk')">
+      <div class="waypoint-card-inner">
+        <div class="waypoint-icon" aria-hidden="true">✦</div>
+        <div class="waypoint-meta">
+          <div class="waypoint-type">Heritage</div>
+          <div class="waypoint-title">Sheffield Country Walk</div>
+          <div class="waypoint-excerpt">The route joins one of Sheffield's oldest walking paths along the Rother valley</div>
+        </div>
+        <div class="waypoint-distance">1.2 mi</div>
+      </div>
+    </div>
+
+    <!-- Waypoint card — practical -->
+    <div class="waypoint-card" role="button" tabindex="0"
+      aria-label="M1 motorway crossing. 3.1 miles ahead."
+      onclick="openStory('m1-crossing')">
+      <div class="waypoint-card-inner">
+        <div class="waypoint-icon" aria-hidden="true">⟶</div>
+        <div class="waypoint-meta">
+          <div class="waypoint-type">Waypoint Guidance</div>
+          <div class="waypoint-title">M1 Motorway Crossing</div>
+          <div class="waypoint-excerpt">Footbridge over the M1 — good pavement on both sides, signed route continues north-east</div>
+        </div>
+        <div class="waypoint-distance">3.1 mi</div>
+      </div>
+    </div>
+
+    <!-- Waypoint card — section end -->
+    <div class="waypoint-card" role="button" tabindex="0"
+      aria-label="Whiston — end of Day 1. 7.4 miles ahead."
+      onclick="openStory('whiston')">
+      <div class="waypoint-card-inner">
+        <div class="waypoint-icon" aria-hidden="true">◉</div>
+        <div class="waypoint-meta">
+          <div class="waypoint-type">Section End · Day 1</div>
+          <div class="waypoint-title">Whiston</div>
+          <div class="waypoint-excerpt">The end of your first day — accommodation and refreshments available in the village</div>
+        </div>
+        <div class="waypoint-distance">7.4 mi</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Story panel ────────────────────────────────────────────────────────── -->
+<div class="story-panel" id="storyPanel" role="dialog" aria-modal="true" aria-labelledby="storyTitle">
+
+  <div class="story-top-bar">
+    <button class="story-close" onclick="closeStory()" aria-label="Close story and return to map">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <path d="M11 3L5 9l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Back to map
+    </button>
+
+    <button class="story-audio-btn" id="audioBtn" onclick="toggleAudio()" aria-label="Listen to this story" aria-pressed="false">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M2 5v4M5 3v8M8 4.5v5M11 2v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <div class="audio-bars" aria-hidden="true">
+        <div class="audio-bar"></div>
+        <div class="audio-bar"></div>
+        <div class="audio-bar"></div>
+      </div>
+      <span id="audioBtnText">Listen</span>
+    </button>
+  </div>
+
+  <div class="story-scroll">
+
+    <!-- Story hero -->
+    <div class="story-hero">
+      <div class="story-type-tag">Heritage · Day 1, Wincobank</div>
+      <h2 class="story-title" id="storyTitle">Wincobank Hall &amp; the Sheffield Abolitionists</h2>
+      <div class="story-location-line">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <circle cx="6" cy="5" r="2" stroke="#A89F90" stroke-width="1.2"/>
+          <path d="M6 1C3.8 1 2 2.8 2 5c0 3 4 6 4 6s4-3 4-6c0-2.2-1.8-4-4-4z" stroke="#A89F90" stroke-width="1.2" fill="none"/>
+        </svg>
+        <span class="story-location-text">Wincobank, Sheffield</span>
+      </div>
+    </div>
+
+    <!-- Story body -->
+    <div class="story-body">
+      <div class="story-rule" aria-hidden="true"></div>
+
+      <p class="story-text">You are standing close to where Olaudah Equiano walked in August 1790. His visit to Sheffield was arranged by the Reverend Thomas Bryant, a local Methodist minister who understood the power of Equiano's story and the importance of bringing it before the people of this city.</p>
+
+      <p class="story-text">Wincobank Hall, which stood not far from where you are now, was the home of Joseph and Elizabeth Read — radical thinkers who were among Equiano's most committed supporters in Sheffield. Their daughter, Mary Anne Rawson, would go on to attend the inaugural World Anti-Slavery Convention in London in 1840, and later formed the Sheffield Ladies Association for the Universal Abolition of Slavery.</p>
+
+      <div class="story-pullquote">
+        <p>The thread from Equiano's visit to this hillside in 1790 runs directly to the abolition of slavery across the British Empire in 1833.</p>
+        <cite>— Dr Rev. Inderjit Bhogal, The Equiano Way</cite>
+      </div>
+
+      <p class="story-text">The hill you stand on — Wincobank Hill — is itself ancient. There is an Iron Age hill fort here, and the hill has been a place of significance for thousands of years before Equiano or Wesley ever walked these paths.</p>
+
+      <p class="story-text">As you begin your journey, carry with you the knowledge that this place was once a centre of resistance, of radical thought, and of faith put into action.</p>
+
+      <!-- Practical info -->
+      <div class="practical-block">
+        <div class="practical-label">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <circle cx="6" cy="6" r="5" stroke="#1A6B5F" stroke-width="1.2"/>
+            <path d="M6 5v4M6 3.5v.5" stroke="#1A6B5F" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          Waypoint information
+        </div>
+        <div class="practical-item">
+          <span class="practical-item-icon" aria-hidden="true">🚪</span>
+          <span>Kissing gate at the bottom of the hill path — follow the waymarker post</span>
+        </div>
+        <div class="practical-item">
+          <span class="practical-item-icon" aria-hidden="true">🐄</span>
+          <span>Fields ahead may contain cattle — keep to the marked path</span>
+        </div>
+        <div class="practical-item">
+          <span class="practical-item-icon" aria-hidden="true">☕</span>
+          <span>Last refreshment stop before Whiston — village shop 0.2 miles back on Wincobank Road</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Prev / next nav -->
+  <nav class="story-nav" aria-label="Story navigation">
+    <button class="story-nav-btn" onclick="closeStory()" aria-label="Back to map">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Map
+    </button>
+    <button class="story-nav-btn primary" aria-label="Next waypoint story">
+      Next story
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </nav>
+
+</div>
+
+<!-- ── Scripts ─────────────────────────────────────────────────────────────── -->
+<script>
+
+// ── Map initialisation ────────────────────────────────────────────────────────
+
+const map = L.map('map', {
+  center: [53.42, -1.38],
+  zoom: 13,
+  zoomControl: true,
+  attributionControl: true,
+  zoomAnimation: true
+});
+
+map.zoomControl.setPosition('bottomright');
+
+// OpenStreetMap tiles — free, no API key
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  maxZoom: 19,
+  className: 'map-tiles'
+}).addTo(map);
+
+// Simulated route polyline (Day 1 area — real GPX would replace this)
+const routeCoords = [
+  [53.4285, -1.3920], // Wincobank Chapel
+  [53.4260, -1.3880],
+  [53.4240, -1.3830],
+  [53.4220, -1.3770],
+  [53.4200, -1.3690],
+  [53.4180, -1.3620],
+  [53.4160, -1.3540],
+  [53.4145, -1.3460],
+  [53.4130, -1.3370],
+  [53.4120, -1.3280],
+  [53.4115, -1.3190],
+  [53.4125, -1.3100],
+  [53.4140, -1.3010], // Whiston approx
+];
+
+// Completed portion (gold)
+const completedCoords = routeCoords.slice(0, 4);
+// Remaining route (teal)
+const remainingCoords = routeCoords.slice(3);
+
+L.polyline(completedCoords, {
+  color: '#C49A2E',
+  weight: 4,
+  opacity: 0.9,
+  lineCap: 'round',
+  lineJoin: 'round'
+}).addTo(map);
+
+L.polyline(remainingCoords, {
+  color: '#1A6B5F',
+  weight: 4,
+  opacity: 0.7,
+  lineCap: 'round',
+  lineJoin: 'round',
+  dashArray: null
+}).addTo(map);
+
+// ── Custom marker factory ─────────────────────────────────────────────────────
+
+function makeMarker(emoji, type) {
+  return L.divIcon({
+    className: '',
+    html: `<div class="waypoint-marker ${type}" role="img" aria-label="${type} waypoint">
+             <div class="waypoint-marker-inner">${emoji}</div>
+           </div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -36]
+  });
+}
+
+// Start marker
+L.marker([53.4285, -1.3920], { icon: makeMarker('⚑', 'start'), alt: 'Start: Wincobank Chapel' })
+  .addTo(map)
+  .bindPopup('<b style="font-family:\'Cinzel\',serif;font-size:0.8rem;letter-spacing:0.1em">Wincobank Chapel</b><br><span style="font-family:\'Crimson Pro\',serif;font-size:0.85rem;color:#7A7060">Day 1 start</span>');
+
+// Heritage waypoints
+const heritageWaypoints = [
+  { latlng: [53.4245, -1.3840], label: 'Wincobank Hall area', emoji: '✦' },
+  { latlng: [53.4170, -1.3590], label: 'River Rother crossing', emoji: '≋' },
+  { latlng: [53.4130, -1.3250], label: 'Sheffield Country Walk junction', emoji: '✦' },
+];
+
+heritageWaypoints.forEach(wp => {
+  L.marker(wp.latlng, { icon: makeMarker(wp.emoji, 'heritage'), alt: wp.label })
+    .addTo(map)
+    .bindPopup(`<b style="font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:0.1em">${wp.label}</b>`);
+});
+
+// End marker
+L.marker([53.4140, -1.3010], { icon: makeMarker('◉', 'end'), alt: 'End: Whiston' })
+  .addTo(map)
+  .bindPopup('<b style="font-family:\'Cinzel\',serif;font-size:0.8rem;letter-spacing:0.1em">Whiston</b><br><span style="font-family:\'Crimson Pro\',serif;font-size:0.85rem;color:#7A7060">Day 1 end · 7.4 miles</span>');
+
+// GPS position dot (simulated position — mid walk)
+const gpsDotIcon = L.divIcon({
+  className: '',
+  html: `<div class="gps-dot-outer" aria-label="Your current position"><div class="gps-dot-inner"></div></div>`,
+  iconSize: [20, 20],
+  iconAnchor: [10, 10]
+});
+
+const gpsMarker = L.marker([53.4246, -1.3842], {
+  icon: gpsDotIcon,
+  zIndexOffset: 1000,
+  alt: 'Your current position'
+}).addTo(map);
+
+// Hide loading overlay
+setTimeout(() => {
+  document.getElementById('mapLoading').classList.add('hidden');
+
+  // Show waypoint alert after a moment
+  setTimeout(() => {
+    document.getElementById('waypointAlert').classList.add('visible');
+  }, 1200);
+}, 1400);
+
+// ── Drawer interaction ────────────────────────────────────────────────────────
+
+const drawer = document.getElementById('drawer');
+const handle = document.getElementById('drawerHandle');
+let drawerOpen = false;
+
+function setDrawerOpen(open) {
+  drawerOpen = open;
+  // Re-enable CSS transition when snapping to final position
+  drawer.style.transition = 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
+  drawer.style.transform  = '';
+  drawer.classList.toggle('open', drawerOpen);
+  handle.setAttribute('aria-expanded', drawerOpen);
+  document.getElementById('map').style.bottom = drawerOpen ? '60%' : 'var(--drawer-peek)';
+  document.querySelector('.btn-locate').style.bottom = drawerOpen
+    ? 'calc(60% + 1rem)'
+    : 'calc(var(--drawer-peek) + 1rem)';
+}
+
+function toggleDrawer() { setDrawerOpen(!drawerOpen); }
+
+// Tap handle to toggle
+handle.addEventListener('click', toggleDrawer);
+handle.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleDrawer(); }
+});
+
+// ── Swipe gesture on drawer ───────────────────────────────────────────────────
+//
+// Logic:
+//   touchstart  — record finger start position
+//   touchmove   — track delta Y, apply live translation (no transition), ignore
+//                 horizontal swipes and scroll inside drawer content
+//   touchend    — if swipe > threshold → snap open/closed
+//                 otherwise → snap back to current state
+//
+// The drawer's CSS `transform` is temporarily overridden during the drag so the
+// user sees the drawer follow their finger in real time.
+
+const SWIPE_THRESHOLD = 60;    // px needed to trigger open/close
+const SWIPE_VELOCITY  = 0.4;   // px/ms — fast flick counts even if < threshold
+
+let touchStartY   = 0;
+let touchStartX   = 0;
+let touchStartTime = 0;
+let dragging      = false;
+let dragDeltaY    = 0;
+let isHorizSwipe  = null;       // null = not yet determined
+
+// The open state's natural translateY is 0; closed state is (100% - peek).
+// We calculate the closed offset in px so we can interpolate mid-drag.
+function getClosedOffset() {
+  return drawer.offsetHeight - parseInt(
+    getComputedStyle(document.documentElement)
+      .getPropertyValue('--drawer-peek') || '120', 10
+  );
+}
+
+drawer.addEventListener('touchstart', e => {
+  // Don't hijack touch if user is scrolling inside the drawer content
+  const drawerContent = document.getElementById('drawerContent');
+  if (drawerOpen && drawerContent.contains(e.target) && drawerContent.scrollTop > 0) return;
+
+  touchStartY    = e.touches[0].clientY;
+  touchStartX    = e.touches[0].clientX;
+  touchStartTime = Date.now();
+  dragging       = false;
+  dragDeltaY     = 0;
+  isHorizSwipe   = null;
+
+  // Disable CSS transition so movement follows finger precisely
+  drawer.style.transition = 'none';
+}, { passive: true });
+
+drawer.addEventListener('touchmove', e => {
+  const dy = e.touches[0].clientY - touchStartY;
+  const dx = e.touches[0].clientX - touchStartX;
+
+  // First meaningful move — determine swipe axis
+  if (isHorizSwipe === null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+    isHorizSwipe = Math.abs(dx) > Math.abs(dy);
+  }
+
+  // Ignore horizontal swipes entirely
+  if (isHorizSwipe) return;
+
+  dragging   = true;
+  dragDeltaY = dy;
+
+  // Compute live translateY:
+  //   Open state base  = 0
+  //   Closed state base = closedOffset
+  const base = drawerOpen ? 0 : getClosedOffset();
+  let translate = base + dy;
+
+  // Clamp: don't allow dragging above fully open (translate < 0)
+  // or below fully closed (translate > closedOffset)
+  const closedOffset = getClosedOffset();
+  translate = Math.max(0, Math.min(translate, closedOffset));
+
+  // Apply rubber-band resistance when pulling beyond bounds
+  drawer.style.transform = `translateY(${translate}px)`;
+}, { passive: true });
+
+drawer.addEventListener('touchend', e => {
+  if (!dragging || isHorizSwipe) {
+    drawer.style.transition = '';
+    return;
+  }
+
+  const elapsed  = Date.now() - touchStartTime;
+  const velocity = Math.abs(dragDeltaY) / elapsed; // px/ms
+  const isFastSwipe = velocity > SWIPE_VELOCITY;
+
+  // Decide whether to open or close:
+  // A swipe UP (negative dy) from closed → open
+  // A swipe DOWN (positive dy) from open  → close
+  // Use threshold or velocity to commit
+  if (!drawerOpen) {
+    // Currently closed — open on upward swipe
+    const shouldOpen = dragDeltaY < -SWIPE_THRESHOLD || (isFastSwipe && dragDeltaY < 0);
+    setDrawerOpen(shouldOpen);
+  } else {
+    // Currently open — close on downward swipe
+    const shouldClose = dragDeltaY > SWIPE_THRESHOLD || (isFastSwipe && dragDeltaY > 0);
+    setDrawerOpen(!shouldClose);
+  }
+
+  dragging = false;
+}, { passive: true });
+
+// ── Story panel ───────────────────────────────────────────────────────────────
+
+const storyPanel = document.getElementById('storyPanel');
+
+function openStory(id) {
+  storyPanel.classList.add('open');
+  storyPanel.focus();
+  // Close drawer
+  if (drawerOpen) toggleDrawer();
+  // Clear waypoint alert
+  document.getElementById('waypointAlert').classList.remove('visible');
+}
+
+function closeStory() {
+  storyPanel.classList.remove('open');
+  stopAudio();
+}
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeStory();
+});
+
+// ── Audio (Web Speech API) ────────────────────────────────────────────────────
+
+let utterance = null;
+let speaking = false;
+
+const storyText = `You are standing close to where Olaudah Equiano walked in August 1790.
+His visit to Sheffield was arranged by the Reverend Thomas Bryant, a local Methodist minister.
+Wincobank Hall, which stood not far from where you are now, was the home of Joseph and Elizabeth Read —
+radical thinkers who were among Equiano's most committed supporters in Sheffield.
+Their daughter, Mary Anne Rawson, went on to attend the inaugural World Anti-Slavery Convention in 1840,
+and later formed the Sheffield Ladies Association for the Universal Abolition of Slavery.
+The thread from Equiano's visit to this hillside in 1790 runs directly to the abolition of slavery across the British Empire in 1833.`;
+
+function toggleAudio() {
+  if (speaking) {
+    stopAudio();
+  } else {
+    startAudio();
+  }
+}
+
+function startAudio() {
+  if (!('speechSynthesis' in window)) {
+    alert('Audio narration is not supported in this browser. Please try Chrome or Safari.');
+    return;
+  }
+  stopAudio();
+  utterance = new SpeechSynthesisUtterance(storyText);
+  utterance.rate = 0.9;
+  utterance.pitch = 1;
+  utterance.lang = 'en-GB';
+
+  // Prefer a British English voice if available
+  const voices = speechSynthesis.getVoices();
+  const preferred = voices.find(v => v.lang === 'en-GB' && v.name.toLowerCase().includes('female'))
+    || voices.find(v => v.lang === 'en-GB')
+    || voices.find(v => v.lang.startsWith('en'));
+  if (preferred) utterance.voice = preferred;
+
+  utterance.onend = () => { speaking = false; updateAudioBtn(); };
+  utterance.onerror = () => { speaking = false; updateAudioBtn(); };
+
+  speechSynthesis.speak(utterance);
+  speaking = true;
+  updateAudioBtn();
+}
+
+function stopAudio() {
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  speaking = false;
+  updateAudioBtn();
+}
+
+function updateAudioBtn() {
+  const btn = document.getElementById('audioBtn');
+  const txt = document.getElementById('audioBtnText');
+  btn.classList.toggle('playing', speaking);
+  btn.setAttribute('aria-pressed', speaking);
+  txt.textContent = speaking ? 'Stop' : 'Listen';
+  btn.setAttribute('aria-label', speaking ? 'Stop audio narration' : 'Listen to this story');
+}
+
+// Load voices async (Chrome requires this)
+if ('speechSynthesis' in window) {
+  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+}
+
+// ── GPS locate button ─────────────────────────────────────────────────────────
+
+const btnLocate = document.getElementById('btnLocate');
+let locating = false;
+
+btnLocate.addEventListener('click', () => {
+  if (!navigator.geolocation) {
+    alert('Location is not available in this browser.');
+    return;
+  }
+
+  locating = !locating;
+  btnLocate.classList.toggle('active', locating);
+  btnLocate.setAttribute('aria-pressed', locating);
+  btnLocate.setAttribute('aria-label', locating ? 'Stop tracking my location' : 'Show my location on the map');
+
+  if (locating) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude, longitude } = pos.coords;
+      gpsMarker.setLatLng([latitude, longitude]);
+      map.setView([latitude, longitude], 15, { animate: true });
+    }, () => {
+      locating = false;
+      btnLocate.classList.remove('active');
+    });
+  }
+});
+
+// ── Waypoint alert click ──────────────────────────────────────────────────────
+
+document.getElementById('waypointAlert').addEventListener('click', () => {
+  openStory('wincobank-hall');
+});
+
+</script>
+</body>
+</html>
