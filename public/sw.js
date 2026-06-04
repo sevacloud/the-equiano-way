@@ -1,4 +1,4 @@
-const CACHE_NAME = 'equiano-v1';
+const CACHE_NAME = 'equiano-v2';
 const TILE_CACHE = 'osm-tiles';
 
 const PRECACHE_URLS = [
@@ -11,15 +11,8 @@ const PRECACHE_URLS = [
   '/css/components.css',
   '/js/session.js',
   '/js/start-prompt.js',
-  '/js/map.js',
-  '/js/gps.js',
-  '/js/drawer.js',
-  '/js/story.js',
-  '/js/report.js',
   '/manifest.json',
-  '/data/waypoints.json',
   '/data/sections.json',
-  '/data/route.gpx',
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js'
 ];
