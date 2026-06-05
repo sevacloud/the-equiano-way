@@ -517,7 +517,7 @@ document.getElementById('issueForm').addEventListener('submit', function(e) {
   btn.disabled = true;
   btn.textContent = 'Sending…';
   statusEl.className = 'status-msg';
-  statusEl.style.display = 'none';
+  statusEl.removeAttribute('style');
 
   var formData = {
     type: 'Issue Report',
@@ -554,10 +554,15 @@ document.getElementById('issueForm').addEventListener('submit', function(e) {
       statusEl.className = 'status-msg error';
       statusEl.textContent = res.error || 'Something went wrong. Please try again.';
     }
-  }).catch(function() {
+  }).catch(function(err) {
     EquianoReport.queueOfflineReport(formData);
-    statusEl.className = 'status-msg queued';
-    statusEl.textContent = 'Saved — will send when you\'re back online.';
+    if (navigator.onLine) {
+      statusEl.className = 'status-msg error';
+      statusEl.textContent = 'Failed to send — your report has been saved and will retry automatically.';
+    } else {
+      statusEl.className = 'status-msg queued';
+      statusEl.textContent = 'Saved — will send when you\'re back online.';
+    }
   }).finally(function() {
     btn.disabled = false;
     btn.textContent = 'Submit Report';
@@ -582,7 +587,7 @@ document.getElementById('briefForm').addEventListener('submit', function(e) {
   btn.disabled = true;
   btn.textContent = 'Sending…';
   statusEl.className = 'status-msg';
-  statusEl.style.display = 'none';
+  statusEl.removeAttribute('style');
 
   var gates = [];
   document.querySelectorAll('input[name="gates"]:checked').forEach(function(cb) { gates.push(cb.value); });
@@ -644,8 +649,13 @@ document.getElementById('briefForm').addEventListener('submit', function(e) {
     }
   }).catch(function() {
     EquianoReport.queueOfflineReport(formData);
-    statusEl.className = 'status-msg queued';
-    statusEl.textContent = 'Saved — will send when you\'re back online.';
+    if (navigator.onLine) {
+      statusEl.className = 'status-msg error';
+      statusEl.textContent = 'Failed to send — your brief has been saved and will retry automatically.';
+    } else {
+      statusEl.className = 'status-msg queued';
+      statusEl.textContent = 'Saved — will send when you\'re back online.';
+    }
   }).finally(function() {
     btn.disabled = false;
     btn.textContent = 'Submit Walker\'s Brief';
