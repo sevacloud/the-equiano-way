@@ -65,7 +65,7 @@ provided by The Equiano Way project is covered by this licence.
 
 If you use or adapt this content, please credit it as:
 
-> Content adapted from The Equiano Way (theequianoway.org.uk),
+> Content adapted from The Equiano Way (equianoway.co.uk),
 > licenced under CC BY-NC-SA 4.0.
 
 ---

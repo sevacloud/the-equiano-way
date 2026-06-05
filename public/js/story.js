@@ -1,6 +1,8 @@
 var storyPanel = document.getElementById('storyPanel');
+var currentStorySlug = null;
 
 function openStory(id) {
+  currentStorySlug = id;
   storyPanel.classList.add('open');
   storyPanel.focus();
   if (drawerOpen) toggleDrawer();
@@ -9,6 +11,36 @@ function openStory(id) {
 
 function closeStory() {
   storyPanel.classList.remove('open');
+  currentStorySlug = null;
+  stopAudio();
+}
+
+function nextStory() {
+  var waypoints = window.equianoWaypoints || [];
+  if (!waypoints.length) return;
+
+  var currentIndex = -1;
+  for (var i = 0; i < waypoints.length; i++) {
+    if (waypoints[i].slug === currentStorySlug) {
+      currentIndex = i;
+      break;
+    }
+  }
+
+  var nextIndex = (currentIndex + 1) % waypoints.length;
+  var next = waypoints[nextIndex];
+
+  var titleEl = document.getElementById('storyTitle');
+  var typeTag = storyPanel.querySelector('.story-type-tag');
+  var bodyEl = storyPanel.querySelector('.story-text');
+  var locationEl = storyPanel.querySelector('.story-location-text');
+
+  if (titleEl) titleEl.textContent = next.title;
+  if (typeTag) typeTag.textContent = (next.type === 'heritage' ? 'Heritage' : 'Waypoint Guidance') + ' · ' + next.sectionSlug;
+  if (bodyEl) bodyEl.textContent = next.body;
+  if (locationEl) locationEl.textContent = next.subtitle;
+
+  currentStorySlug = next.slug;
   stopAudio();
 }
 
