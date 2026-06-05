@@ -878,6 +878,31 @@ footer {
 }
 .skip-link:focus { top: 1rem; }
 
+/* ── Production mode (hero only) ──────────────────────────────────────────── */
+body.prod .section-about,
+body.prod .section-route,
+body.prod .section-equiano,
+body.prod .section-cta,
+body.prod footer,
+body.prod .hero-waypoints,
+body.prod .scroll-indicator,
+body.prod nav .nav-links { display: none; }
+
+body.prod .btn-start,
+body.prod .hero-secondary { display: none; }
+
+body.prod .hero-content::after {
+  content: 'Coming Soon\2026';
+  display: block;
+  margin-top: 2rem;
+  font-family: var(--font-reading);
+  font-size: 0.9rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
 </style>
 </head>
 <body>
