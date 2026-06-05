@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olaudah Equiano — The Equiano Way</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/css/nav.css">
+<link rel="stylesheet" href="/css/components.css">
+<style>
+.page-hero {
+  background: var(--teal-dark);
+  padding: 5rem 2.5rem 4rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 30% 70%, rgba(196,154,46,0.06) 0%, transparent 60%);
+}
+
+.page-hero-ornament {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  color: var(--gold);
+  opacity: 0.2;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+  position: relative;
+}
+
+.page-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  color: var(--parchment);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.page-hero-dates {
+  font-family: var(--font-reading);
+  font-size: 0.8rem;
+  letter-spacing: 0.35em;
+  color: var(--stone-light);
+  text-transform: uppercase;
+  position: relative;
+}
+
+.content {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 4rem 2.5rem;
+}
+
+.content h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+  font-weight: 400;
+  color: var(--teal-dark);
+  letter-spacing: 0.04em;
+  margin-bottom: 1.25rem;
+  margin-top: 3rem;
+}
+
+.content h2:first-of-type { margin-top: 0; }
+
+.content p {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--ink-light);
+  margin-bottom: 1.25rem;
+}
+
+.pullquote-featured {
+  margin: 2.5rem 0;
+  padding: 2rem;
+  background: var(--teal-dark);
+  position: relative;
+}
+
+.pullquote-featured::before {
+  content: '\201C';
+  font-family: var(--font-display);
+  font-size: 6rem;
+  line-height: 0.7;
+  color: var(--gold);
+  opacity: 0.3;
+  position: absolute;
+  top: 1rem;
+  left: 1.5rem;
+}
+
+.pullquote-featured p {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--parchment);
+  line-height: 1.75;
+  position: relative;
+  z-index: 1;
+  padding-left: 1rem;
+  margin-bottom: 0;
+}
+
+.pullquote-featured cite {
+  display: block;
+  margin-top: 1rem;
+  font-family: var(--font-reading);
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-style: normal;
+  opacity: 0.8;
+  padding-left: 1rem;
+}
+
+.timeline {
+  margin: 2.5rem 0;
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--gold);
+}
+
+.timeline-item {
+  padding: 0 0 1.75rem 1.25rem;
+  position: relative;
+}
+
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -1.5rem;
+  top: 0.5rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  margin-left: -4px;
+}
+
+.timeline-date {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  color: var(--teal);
+  margin-bottom: 0.25rem;
+}
+
+.timeline-text {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--ink-light);
+  margin-bottom: 0;
+}
+
+.section-divider {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  margin: 3rem auto;
+}
+
+.page-nav {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 2rem;
+  border-top: 1px solid var(--parchment-2);
+  margin-top: 3rem;
+}
+
+@media (max-width: 768px) {
+  .page-hero { padding: 4rem 1.25rem 3rem; }
+  .content { padding: 3rem 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<header class="top-bar" role="banner">
+  <div class="top-bar-left">
+    <a href="index.html" class="btn-back" aria-label="Back to home">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M12 4L6 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <span class="top-wordmark">The Equiano Way</span>
+  </div>
+  <div class="top-bar-right">
+    <ul class="nav-links">
+      <li><a href="route.html">Route</a></li>
+      <li><a href="plan.html">Plan</a></li>
+      <li><a href="map.html">Map</a></li>
+    </ul>
+  </div>
+</header>
+
+<div class="page-hero">
+  <div class="page-hero-ornament" aria-hidden="true">✦</div>
+  <h1 id="main">Olaudah Equiano</h1>
+  <p class="page-hero-dates">c. 1745 — 1797</p>
+</div>
+
+<main class="content">
+
+  <h2>Biography</h2>
+  <p>Born a prince in what is now south-eastern Nigeria, Olaudah Equiano was kidnapped at the age of eleven and sold into the transatlantic slave trade. He endured the Middle Passage — the horrific sea crossing from Africa to the Americas — and spent years in servitude under various masters in the Caribbean, Virginia, and at sea.</p>
+  <p>Through extraordinary determination and resourcefulness, Equiano earned enough money trading on his own account to purchase his freedom in 1766. He settled in London and dedicated the rest of his life to the campaign for the abolition of the slave trade.</p>
+
+  <h2>The Sheffield Visit</h2>
+  <p>In August 1790, Equiano visited Sheffield as part of his book tour promoting <em>The Interesting Narrative of the Life of Olaudah Equiano</em>. His visit was arranged by the Reverend Thomas Bryant, a local Methodist minister who understood the power of personal testimony.</p>
+  <p>He was hosted by Joseph and Elizabeth Read at Wincobank Hall — radical thinkers and committed abolitionists. Their daughter, Mary Anne Rawson, would later found the Sheffield Ladies Association for the Universal Abolition of Slavery and attend the inaugural World Anti-Slavery Convention in 1840.</p>
+  <p>The thread from Equiano's visit to this hillside in 1790 runs directly to the abolition of slavery across the British Empire in 1833.</p>
+
+  <h2>The Wesley Connection</h2>
+  <p>John Wesley, the founder of Methodism, was profoundly influenced by Equiano's autobiography. It is said that Wesley was reading it on his deathbed in February 1791. Days later, he wrote what would be his final letter — to a young William Wilberforce, urging him to continue the fight against slavery.</p>
+
+  <div class="pullquote-featured">
+    <p>Go on, in the name of God and in the power of His might, till even American slavery (the vilest that ever saw the sun) shall vanish away before it.</p>
+    <cite>John Wesley, to William Wilberforce — 24 February 1791</cite>
+  </div>
+
+  <p>This letter connected Equiano's pen to Wesley's conscience to Wilberforce's campaign. The route you walk passes through the landscape where all three threads converge.</p>
+
+  <h2>The Campaign for Abolition</h2>
+  <p>Equiano co-founded the Sons of Africa, a group of prominent Africans living in Britain who campaigned for abolition. He worked alongside Granville Sharp and the Committee for the Abolition of the Slave Trade, providing crucial testimony and challenging public indifference.</p>
+  <p>His autobiography, published in 1789, was one of the first widely-read accounts of slavery written by a formerly enslaved person. It went through nine editions in his lifetime and was translated into Dutch, German and Russian. It changed minds, raised funds, and gave the abolitionist movement a human face.</p>
+
+  <h2>Legacy</h2>
+  <p>Equiano married Susannah Cullen of Soham, Cambridgeshire in 1792. They had two daughters: Anna Maria and Joanna. He died on 31 March 1797, ten years before the Slave Trade Act of 1807 finally outlawed the British slave trade, and 36 years before the Slavery Abolition Act of 1833 freed enslaved people across the Empire.</p>
+  <p>His legacy endures in the route you are walking — a landscape that remembers his visit, honours his courage, and connects his story to the wider movement that changed the world.</p>
+
+  <div class="section-divider" aria-hidden="true"></div>
+
+  <h2>Key Dates</h2>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-date">c. 1745</div>
+      <p class="timeline-text">Born in the Kingdom of Benin (present-day Nigeria)</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">c. 1756</div>
+      <p class="timeline-text">Kidnapped and sold into slavery; endures the Middle Passage</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">1766</div>
+      <p class="timeline-text">Purchases his freedom for £40 in Montserrat</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">1789</div>
+      <p class="timeline-text">Publishes <em>The Interesting Narrative</em> — becomes a bestseller</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">1790</div>
+      <p class="timeline-text">Visits Sheffield; hosted at Wincobank Hall by the Read family</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">1791</div>
+      <p class="timeline-text">Wesley writes his final letter to Wilberforce, urging abolition</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">1792</div>
+      <p class="timeline-text">Marries Susannah Cullen in Soham, Cambridgeshire</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">1797</div>
+      <p class="timeline-text">Dies in London, aged approximately 52</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">1807</div>
+      <p class="timeline-text">Slave Trade Act abolishes British slave trade</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">1833</div>
+      <p class="timeline-text">Slavery Abolition Act frees enslaved people across the British Empire</p>
+    </div>
+  </div>
+
+  <nav class="page-nav" aria-label="Page navigation">
+    <a href="index.html" class="btn-outline">← Home</a>
+    <a href="route.html" class="btn-outline">The Route</a>
+    <a href="map.html" class="btn-primary">Open the Map</a>
+  </nav>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <span class="footer-wordmark">The Equiano Way</span>
+    <span class="footer-credit">equianoway.co.uk</span>
+  </div>
+</footer>
+
+</body>
+</html>

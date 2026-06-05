@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan Your Walk — The Equiano Way</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/css/nav.css">
+<link rel="stylesheet" href="/css/components.css">
+<style>
+.page-hero {
+  background: var(--teal-dark);
+  padding: 5rem 2.5rem 4rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(196,154,46,0.06) 0%, transparent 70%);
+}
+
+.page-hero-label {
+  font-family: var(--font-reading);
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.page-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  color: var(--parchment);
+  letter-spacing: 0.05em;
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.page-hero-sub {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--parchment);
+  opacity: 0.7;
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.7;
+  position: relative;
+}
+
+.content {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 4rem 2.5rem;
+}
+
+.content h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+  font-weight: 400;
+  color: var(--teal-dark);
+  letter-spacing: 0.04em;
+  margin-bottom: 1.25rem;
+  margin-top: 3rem;
+}
+
+.content h2:first-of-type { margin-top: 0; }
+
+.content p {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--ink-light);
+  margin-bottom: 1.25rem;
+}
+
+.content ul, .content ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+  list-style: disc;
+}
+
+.content li {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--ink-light);
+  margin-bottom: 0.5rem;
+}
+
+.info-card {
+  background: var(--teal-light);
+  border: 1px solid rgba(26,107,95,0.2);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.info-card-label {
+  font-family: var(--font-reading);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.75rem;
+}
+
+.info-card p {
+  font-family: var(--font-reading);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ink-light);
+  margin-bottom: 0.5rem;
+}
+
+.info-card p:last-child { margin-bottom: 0; }
+
+.practical-list {
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.practical-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--white);
+  border: 1px solid var(--parchment-2);
+}
+
+.practical-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+  margin-top: 0.1rem;
+}
+
+.practical-text {
+  font-family: var(--font-reading);
+  font-size: 0.9rem;
+  color: var(--ink-light);
+  line-height: 1.5;
+}
+
+.practical-text strong {
+  color: var(--ink);
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+.install-steps {
+  margin: 1.5rem 0;
+}
+
+.install-steps h3 {
+  font-family: var(--font-reading);
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.install-steps ol {
+  padding-left: 1.5rem;
+  list-style: decimal;
+}
+
+.install-steps li {
+  font-family: var(--font-reading);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--ink-light);
+  margin-bottom: 0.4rem;
+}
+
+.section-divider {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  margin: 3rem auto;
+}
+
+.page-nav {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 2rem;
+  border-top: 1px solid var(--parchment-2);
+  margin-top: 3rem;
+}
+
+#waypointInfo { min-height: 60px; }
+
+@media (max-width: 768px) {
+  .page-hero { padding: 4rem 1.25rem 3rem; }
+  .content { padding: 3rem 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<header class="top-bar" role="banner">
+  <div class="top-bar-left">
+    <a href="index.html" class="btn-back" aria-label="Back to home">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M12 4L6 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <span class="top-wordmark">The Equiano Way</span>
+  </div>
+  <div class="top-bar-right">
+    <ul class="nav-links">
+      <li><a href="route.html">Route</a></li>
+      <li><a href="equiano.html">Equiano</a></li>
+      <li><a href="map.html">Map</a></li>
+    </ul>
+  </div>
+</header>
+
+<div class="page-hero">
+  <p class="page-hero-label">Preparation &amp; guidance</p>
+  <h1 id="main">Plan Your Walk</h1>
+  <p class="page-hero-sub">Everything you need to know before setting out on The Equiano Way</p>
+</div>
+
+<main class="content">
+
+  <h2>What to Expect</h2>
+  <p>The Equiano Way is an 80-mile walking route across South Yorkshire, North Lincolnshire and East Yorkshire. The terrain is mostly flat to gently undulating — field paths, canal towpaths, quiet lanes and riverside tracks. There are no mountains, but some days are long and require stamina.</p>
+  <p>The route is waymarked in places but not throughout. You should carry a map or use the GPS-enabled map on this app. Mobile signal is generally good but may be patchy in the Humberhead Levels between Days 4 and 5.</p>
+
+  <div class="info-card">
+    <p class="info-card-label">Difficulty</p>
+    <p>Moderate. Suitable for regular walkers with reasonable fitness. The longest day (Day 4, Austerfield to Epworth) is 13.2 miles.</p>
+  </div>
+
+  <h2>What to Bring</h2>
+  <ul>
+    <li>Comfortable walking boots — waterproof recommended</li>
+    <li>Waterproof jacket and trousers (weather in Yorkshire is changeable)</li>
+    <li>Daypack with water, snacks, and sun protection</li>
+    <li>Charged phone with this app saved to your home screen</li>
+    <li>OS Explorer maps 278, 279, 280, 281 (or digital equivalent)</li>
+    <li>Small first aid kit</li>
+    <li>Notebook or camera for your observations</li>
+  </ul>
+
+  <h2>On the Route — Day 1 Practical Info</h2>
+  <p>Below is an example of practical waypoint information available on the map. Full data for all sections will be added as walkers submit their briefs.</p>
+
+  <div id="waypointInfo">
+    <div class="practical-list" id="practicalList"></div>
+  </div>
+
+  <h2>Getting There</h2>
+  <p><strong>Start (Wincobank Chapel, Sheffield):</strong> The nearest station is Meadowhall (0.9 miles). Buses 69 and 69a serve Wincobank Lane. By car, there is limited street parking on Wincobank Lane.</p>
+  <p><strong>End (Wilberforce House, Hull):</strong> Hull Paragon station is 0.3 miles from Wilberforce House. Direct trains run to Sheffield (approx. 1 hour 20 minutes) for return.</p>
+  <p><strong>Between sections:</strong> Most section start/end points are accessible by bus or train. Check Traveline Yorkshire for local connections.</p>
+
+  <div class="section-divider" aria-hidden="true"></div>
+
+  <h2>Install as an App</h2>
+  <p>The Equiano Way works offline once installed on your phone. Save it to your home screen for quick access and offline map use.</p>
+
+  <div class="install-steps">
+    <h3>Android (Chrome)</h3>
+    <ol>
+      <li>Open this site in Chrome</li>
+      <li>Tap the three-dot menu in the top right</li>
+      <li>Tap "Add to Home screen" or "Install app"</li>
+      <li>Confirm the name and tap "Add"</li>
+      <li>The app icon will appear on your home screen</li>
+    </ol>
+
+    <h3>iOS (Safari)</h3>
+    <ol>
+      <li>Open this site in Safari (not Chrome)</li>
+      <li>Tap the Share button (square with arrow) at the bottom</li>
+      <li>Scroll down and tap "Add to Home Screen"</li>
+      <li>Confirm the name and tap "Add"</li>
+      <li>The app icon will appear on your home screen</li>
+    </ol>
+  </div>
+
+  <div class="info-card">
+    <p class="info-card-label">Offline use</p>
+    <p>Once installed, the map, route data, and all stories are cached on your device. You can use the app without a mobile signal. Map tiles you have viewed will also be available offline.</p>
+  </div>
+
+  <nav class="page-nav" aria-label="Page navigation">
+    <a href="index.html" class="btn-outline">← Home</a>
+    <a href="route.html" class="btn-outline">The Route</a>
+    <a href="map.html" class="btn-primary">Open the Map</a>
+  </nav>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <span class="footer-wordmark">The Equiano Way</span>
+    <span class="footer-credit">equianoway.co.uk</span>
+  </div>
+</footer>
+
+<script>
+fetch('/data/waypoints.json')
+  .then(function(res) { return res.json(); })
+  .then(function(waypoints) {
+    var list = document.getElementById('practicalList');
+    if (!waypoints || !waypoints.length) {
+      list.innerHTML = '<p style="font-style:italic;color:#7A7060">No waypoint data available yet.</p>';
+      return;
+    }
+    var html = '';
+    waypoints.forEach(function(wp) {
+      var icon = wp.type === 'heritage' ? '✦' : '⟶';
+      var info = wp.practicalInfo || {};
+      html += '<div class="practical-item">' +
+        '<span class="practical-icon" aria-hidden="true">' + icon + '</span>' +
+        '<div class="practical-text">' +
+          '<strong>' + wp.title + '</strong>' +
+          (info.access ? info.access : '') +
+          (info.terrain ? ' · ' + info.terrain : '') +
+          (info.facilities ? ' · ' + info.facilities : '') +
+        '</div></div>';
+    });
+    list.innerHTML = html;
+  })
+  .catch(function() {
+    document.getElementById('practicalList').innerHTML =
+      '<p style="font-style:italic;color:#7A7060">Could not load waypoint data.</p>';
+  });
+</script>
+</body>
+</html>

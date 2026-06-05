@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Route — The Equiano Way</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/css/nav.css">
+<link rel="stylesheet" href="/css/components.css">
+<style>
+.page-hero {
+  background: var(--teal-dark);
+  padding: 5rem 2.5rem 4rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(196,154,46,0.06) 0%, transparent 70%);
+}
+
+.page-hero-label {
+  font-family: var(--font-reading);
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.page-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  color: var(--parchment);
+  letter-spacing: 0.05em;
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.page-hero-sub {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--parchment);
+  opacity: 0.7;
+  max-width: 560px;
+  margin: 0 auto;
+  line-height: 1.7;
+  position: relative;
+}
+
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 4rem 2.5rem;
+}
+
+.intro {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--ink-light);
+  margin-bottom: 3rem;
+}
+
+.section-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 3rem;
+}
+
+.section-card {
+  border: 1px solid var(--parchment-2);
+  background: var(--white);
+  transition: border-color 0.2s;
+}
+
+.section-card:hover {
+  border-color: rgba(196,154,46,0.4);
+}
+
+.section-card summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.25rem;
+  cursor: pointer;
+  min-height: 56px;
+  list-style: none;
+}
+
+.section-card summary::-webkit-details-marker { display: none; }
+
+.section-card summary::after {
+  content: '+';
+  font-family: var(--font-reading);
+  font-size: 1.2rem;
+  color: var(--stone-light);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+.section-card[open] summary::after {
+  content: '−';
+  color: var(--teal);
+}
+
+.section-card summary:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.card-day {
+  font-family: var(--font-reading);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+}
+
+.card-name {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.card-miles {
+  font-family: var(--font-reading);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: var(--stone);
+  white-space: nowrap;
+  margin-left: 1rem;
+}
+
+.card-body {
+  padding: 0 1.25rem 1.25rem;
+  border-top: 1px solid var(--parchment-2);
+}
+
+.card-theme {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--ink-light);
+  line-height: 1.7;
+  margin-top: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.card-link {
+  font-family: var(--font-reading);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: var(--teal);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.card-link:hover { color: var(--teal-dark); }
+.card-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.branch-callout {
+  background: var(--teal-light);
+  border: 1px solid rgba(26,107,95,0.2);
+  padding: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.branch-callout-label {
+  font-family: var(--font-reading);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.75rem;
+}
+
+.branch-callout p {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--ink-light);
+}
+
+.variant-tag {
+  display: inline-block;
+  font-family: var(--font-reading);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--teal);
+  background: var(--teal-light);
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.page-nav {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 2rem;
+  border-top: 1px solid var(--parchment-2);
+}
+
+@media (max-width: 768px) {
+  .page-hero { padding: 4rem 1.25rem 3rem; }
+  .content { padding: 3rem 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<header class="top-bar" role="banner">
+  <div class="top-bar-left">
+    <a href="index.html" class="btn-back" aria-label="Back to home">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M12 4L6 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <span class="top-wordmark">The Equiano Way</span>
+  </div>
+  <div class="top-bar-right">
+    <ul class="nav-links">
+      <li><a href="equiano.html">Equiano</a></li>
+      <li><a href="plan.html">Plan</a></li>
+      <li><a href="map.html">Map</a></li>
+    </ul>
+  </div>
+</header>
+
+<div class="page-hero">
+  <p class="page-hero-label">80 miles · Sheffield to Hull</p>
+  <h1 id="main">The Route</h1>
+  <p class="page-hero-sub">Seven or eight days of walking through landscapes shaped by faith, freedom and the fight to abolish slavery</p>
+</div>
+
+<main class="content">
+
+  <p class="intro">The Equiano Way covers approximately 80 miles from Wincobank Chapel in Sheffield to Wilberforce House in Hull. The route is divided into 9 sections walked over 7 or 8 days, depending on whether you take the direct path or the alternative via Alkborough. Each section connects a place, a person, and a chapter in the story of abolition.</p>
+
+  <div class="section-cards">
+
+    <details class="section-card">
+      <summary>
+        <div class="card-header">
+          <span class="card-day">Day 1</span>
+          <span class="card-name">Wincobank Chapel → Whiston</span>
+        </div>
+        <span class="card-miles">7.4 mi</span>
+      </summary>
+      <div class="card-body">
+        <p class="card-theme">Equiano in Sheffield; abolitionist roots at Wincobank Hall. You begin at the hill where Equiano himself walked in 1790, passing through landscape that shaped the Sheffield abolition movement.</p>
+        <a href="#" class="card-link">View on OS Maps →</a>
+      </div>
+    </details>
+
+    <details class="section-card">
+      <summary>
+        <div class="card-header">
+          <span class="card-day">Day 2</span>
+          <span class="card-name">Whiston → Roche Abbey</span>
+        </div>
+        <span class="card-miles">8.2 mi</span>
+      </summary>
+      <div class="card-body">
+        <p class="card-theme">From industrial suburbs into the quiet of a Cistercian valley. The route leaves the city behind and enters rolling countryside towards the ruins of a medieval abbey.</p>
+        <a href="#" class="card-link">View on OS Maps →</a>
+      </div>
+    </details>
+
+    <details class="section-card">
+      <summary>
+        <div class="card-header">
+          <span class="card-day">Day 3</span>
+          <span class="card-name">Roche Abbey → Austerfield</span>
+        </div>
+        <span class="card-miles">10.9 mi</span>
+      </summary>
+      <div class="card-body">
+        <p class="card-theme">The Pilgrim Fathers — where the search for religious freedom began. You walk to the birthplace of William Bradford, who would lead the Mayflower Pilgrims.</p>
+        <a href="#" class="card-link">View on OS Maps →</a>
+      </div>
+    </details>
+
+    <details class="section-card">
+      <summary>
+        <div class="card-header">
+          <span class="card-day">Day 4</span>
+          <span class="card-name">Austerfield → Epworth</span>
+        </div>
+        <span class="card-miles">13.2 mi</span>
+      </summary>
+      <div class="card-body">
+        <p class="card-theme">John Wesley's country — along waterways to the home of Methodism. The longest day takes you through flat Levels landscape to the Old Rectory where Wesley grew up.</p>
+        <a href="#" class="card-link">View on OS Maps →</a>
+      </div>
+    </details>
+
+    <details class="section-card">
+      <summary>
+        <div class="card-header">
+          <span class="card-day">Day 5</span>
+          <span class="card-name">Epworth → Scunthorpe</span>
+        </div>
+        <span class="card-miles">11.1 mi</span>
+      </summary>
+      <div class="card-body">
+        <p class="card-theme">Wesley's villages and Salim C Wilson — freed slave turned evangelist. Open farmland and quiet villages with deep Methodist roots.</p>
+        <a href="#" class="card-link">View on OS Maps →</a>
+      </div>
+    </details>
+
+    <details class="section-card">
+      <summary>
+        <div class="card-header">
+          <span class="card-day">Day 6a — Direct</span>
+          <span class="card-name">Scunthorpe → South Ferriby</span>
+        </div>
+        <span class="card-miles">12.5 mi</span>
+      </summary>
+      <div class="card-body">
+        <p class="card-theme">Through Normanby Hall and along the approach to the vast River Humber. The direct route south to the Humber shore.</p>
+        <a href="#" class="card-link">View on OS Maps →</a>
+      </div>
+    </details>
+
+    <details class="section-card">
+      <summary>
+        <div class="card-header">
+          <span class="card-day">Day 6b — Alternative <span class="variant-tag">Alkborough route</span></span>
+          <span class="card-name">Scunthorpe → Alkborough</span>
+        </div>
+        <span class="card-miles">7.7 mi</span>
+      </summary>
+      <div class="card-body">
+        <p class="card-theme">North along the River Trent to Julian's Bower — an ancient turf labyrinth. A shorter day with a contemplative finish at one of England's few surviving turf mazes.</p>
+        <a href="#" class="card-link">View on OS Maps →</a>
+      </div>
+    </details>
+
+    <details class="section-card">
+      <summary>
+        <div class="card-header">
+          <span class="card-day">Day 7b <span class="variant-tag">Alkborough route</span></span>
+          <span class="card-name">Alkborough → South Ferriby</span>
+        </div>
+        <span class="card-miles">9.3 mi</span>
+      </summary>
+      <div class="card-body">
+        <p class="card-theme">Along the Humber bank past the Roman settlement at Eastfield. The two routes rejoin at South Ferriby for the final crossing.</p>
+        <a href="#" class="card-link">View on OS Maps →</a>
+      </div>
+    </details>
+
+    <details class="section-card">
+      <summary>
+        <div class="card-header">
+          <span class="card-day">Day 7 or 8</span>
+          <span class="card-name">South Ferriby → Hull</span>
+        </div>
+        <span class="card-miles">12.1 mi</span>
+      </summary>
+      <div class="card-body">
+        <p class="card-theme">Across the Humber Bridge to Wilberforce House — journey's end. The final day crosses the great estuary on foot and arrives at the home of William Wilberforce.</p>
+        <a href="#" class="card-link">View on OS Maps →</a>
+      </div>
+    </details>
+
+  </div>
+
+  <div class="branch-callout">
+    <p class="branch-callout-label">Branch point — Day 6</p>
+    <p>At Scunthorpe you have a choice. The <strong>direct route</strong> (Day 6a) heads south through Normanby Hall to South Ferriby in a single day. The <strong>alternative</strong> (Days 6b + 7b) takes a longer, quieter path north along the Trent to Alkborough and Julian's Bower before turning east along the Humber bank. Both routes rejoin at South Ferriby for the final day's crossing to Hull.</p>
+  </div>
+
+  <nav class="page-nav" aria-label="Page navigation">
+    <a href="index.html" class="btn-outline">← Home</a>
+    <a href="map.html" class="btn-primary">Open the Map</a>
+  </nav>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <span class="footer-wordmark">The Equiano Way</span>
+    <span class="footer-credit">equianoway.co.uk</span>
+  </div>
+</footer>
+
+</body>
+</html>
