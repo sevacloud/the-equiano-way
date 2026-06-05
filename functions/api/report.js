@@ -10,8 +10,12 @@ function stripHtml(str) {
 }
 
 function corsHeaders(origin) {
+  var allowed = [CORS_ORIGIN, 'http://127.0.0.1:8788', 'http://localhost:8788'];
+  var isAllowed = allowed.indexOf(origin) !== -1 ||
+    /^https:\/\/.*\.equiano-way\.pages\.dev$/.test(origin);
+  var allowedOrigin = isAllowed ? origin : CORS_ORIGIN;
   return {
-    'Access-Control-Allow-Origin': CORS_ORIGIN,
+    'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Content-Type': 'application/json'
@@ -21,15 +25,16 @@ function corsHeaders(origin) {
 export async function onRequest(context) {
   var request = context.request;
   var env = context.env;
+  var origin = request.headers.get('Origin') || '';
 
   if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: corsHeaders() });
+    return new Response(null, { status: 204, headers: corsHeaders(origin) });
   }
 
   if (request.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405,
-      headers: corsHeaders()
+      headers: corsHeaders(origin)
     });
   }
 
@@ -43,7 +48,7 @@ export async function onRequest(context) {
     if (count >= RATE_LIMIT) {
       return new Response(JSON.stringify({ error: 'Too many submissions. Please try again later.' }), {
         status: 429,
-        headers: corsHeaders()
+        headers: corsHeaders(origin)
       });
     }
 
@@ -58,14 +63,14 @@ export async function onRequest(context) {
   } catch (e) {
     return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
       status: 400,
-      headers: corsHeaders()
+      headers: corsHeaders(origin)
     });
   }
 
   if (!body.type || !body.description) {
     return new Response(JSON.stringify({ error: 'Missing required fields: type and description' }), {
       status: 400,
-      headers: corsHeaders()
+      headers: corsHeaders(origin)
     });
   }
 
@@ -138,13 +143,13 @@ export async function onRequest(context) {
       });
       return new Response(JSON.stringify({ ok: true, queued: true }), {
         status: 200,
-        headers: corsHeaders()
+        headers: corsHeaders(origin)
       });
     }
 
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
-      headers: corsHeaders()
+      headers: corsHeaders(origin)
     });
   } catch (e) {
     var fallbackKey2 = 'fallback:' + Date.now();
@@ -157,7 +162,7 @@ export async function onRequest(context) {
     }
     return new Response(JSON.stringify({ ok: true, queued: true }), {
       status: 200,
-      headers: corsHeaders()
+      headers: corsHeaders(origin)
     });
   }
 }
