@@ -137,11 +137,16 @@ export async function onRequest(context) {
     });
 
     if (!resendRes.ok) {
+      var resendError = await resendRes.text();
       var fallbackKey = 'fallback:' + Date.now();
-      await env.REPORT_FALLBACK.put(fallbackKey, JSON.stringify(sanitised), {
+      await env.REPORT_FALLBACK.put(fallbackKey, JSON.stringify({
+        submission: sanitised,
+        resendStatus: resendRes.status,
+        resendError: resendError
+      }), {
         expirationTtl: 604800
       });
-      return new Response(JSON.stringify({ ok: true, queued: true }), {
+      return new Response(JSON.stringify({ ok: true, queued: true, debug: resendError }), {
         status: 200,
         headers: corsHeaders(origin)
       });
