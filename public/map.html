@@ -1163,7 +1163,8 @@ html, body {
 <script src="/js/gps.js"></script>
 <script>
 document.getElementById('waypointAlert').addEventListener('click', function() {
-  openStory('wincobank-hall');
+  var wp = window.getNearestAlertWaypoint ? window.getNearestAlertWaypoint() : null;
+  openStory(wp ? wp.slug : 'wincobank-hall');
 });
 </script>
 <script src="/js/session.js"></script>

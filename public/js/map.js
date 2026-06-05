@@ -66,18 +66,6 @@ L.marker([53.4285, -1.3920], { icon: makeMarker('⚑', 'start'), alt: 'Start: Wi
   .addTo(equianoMap)
   .bindPopup('<b style="font-family:\'Cinzel\',serif;font-size:0.8rem;letter-spacing:0.1em">Wincobank Chapel</b><br><span style="font-family:\'Crimson Pro\',serif;font-size:0.85rem;color:#7A7060">Day 1 start</span>');
 
-var heritageWaypoints = [
-  { latlng: [53.4245, -1.3840], label: 'Wincobank Hall area', emoji: '✦' },
-  { latlng: [53.4170, -1.3590], label: 'River Rother crossing', emoji: '≋' },
-  { latlng: [53.4130, -1.3250], label: 'Sheffield Country Walk junction', emoji: '✦' }
-];
-
-heritageWaypoints.forEach(function(wp) {
-  L.marker(wp.latlng, { icon: makeMarker(wp.emoji, 'heritage'), alt: wp.label })
-    .addTo(equianoMap)
-    .bindPopup('<b style="font-family:\'Cinzel\',serif;font-size:0.8rem;letter-spacing:0.1em">' + wp.label + '</b>');
-});
-
 L.marker([53.4140, -1.3010], { icon: makeMarker('◉', 'end'), alt: 'End: Whiston' })
   .addTo(equianoMap)
   .bindPopup('<b style="font-family:\'Cinzel\',serif;font-size:0.8rem;letter-spacing:0.1em">Whiston</b><br><span style="font-family:\'Crimson Pro\',serif;font-size:0.85rem;color:#7A7060">Day 1 end · 7.4 miles</span>');
@@ -98,9 +86,90 @@ var gpsMarker = L.marker([53.4246, -1.3842], {
 window.equianoMap = equianoMap;
 window.gpsMarker = gpsMarker;
 
+function haversineDistance(lat1, lng1, lat2, lng2) {
+  var R = 6371000;
+  var toRad = Math.PI / 180;
+  var dLat = (lat2 - lat1) * toRad;
+  var dLng = (lng2 - lng1) * toRad;
+  var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(lat1 * toRad) * Math.cos(lat2 * toRad) *
+          Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+window.equianoWaypoints = [];
+var nearestAlertWaypoint = null;
+
+function checkWaypointProximity(lat, lng) {
+  var alertEl = document.getElementById('waypointAlert');
+  var alertText = document.getElementById('waypointAlertText');
+  var closest = null;
+  var closestDist = Infinity;
+
+  for (var i = 0; i < window.equianoWaypoints.length; i++) {
+    var wp = window.equianoWaypoints[i];
+    var dist = haversineDistance(lat, lng, wp.lat, wp.lng);
+    if (dist < wp.triggerRadiusM && dist < closestDist) {
+      closest = wp;
+      closestDist = dist;
+    }
+  }
+
+  if (closest) {
+    nearestAlertWaypoint = closest;
+    alertText.textContent = closest.title + ' nearby';
+    alertEl.classList.add('visible');
+  } else {
+    nearestAlertWaypoint = null;
+    alertEl.classList.remove('visible');
+  }
+}
+
+window.checkWaypointProximity = checkWaypointProximity;
+window.getNearestAlertWaypoint = function() { return nearestAlertWaypoint; };
+
+function loadWaypoints() {
+  fetch('/data/waypoints.json')
+    .then(function(res) {
+      if (!res.ok) throw new Error('Failed to load waypoints');
+      return res.json();
+    })
+    .then(function(waypoints) {
+      if (!waypoints || !waypoints.length) return;
+
+      window.equianoWaypoints = waypoints;
+
+      for (var i = 0; i < waypoints.length; i++) {
+        (function(wp) {
+          var markerType = wp.type === 'heritage' ? 'heritage' : 'practical';
+          var marker = L.marker([wp.lat, wp.lng], {
+            icon: makeMarker(wp.icon, markerType),
+            alt: wp.title
+          }).addTo(equianoMap);
+
+          marker.bindPopup(
+            '<b style="font-family:\'Cinzel\',serif;font-size:0.8rem;letter-spacing:0.1em">' + wp.title + '</b>' +
+            '<br><span style="font-family:\'Crimson Pro\',serif;font-size:0.85rem;color:#7A7060">' + wp.subtitle + '</span>'
+          );
+
+          marker.on('click', function() {
+            if (typeof openStory === 'function') {
+              openStory(wp.slug);
+            }
+          });
+        })(waypoints[i]);
+      }
+
+      var gpsPos = gpsMarker.getLatLng();
+      checkWaypointProximity(gpsPos.lat, gpsPos.lng);
+    })
+    .catch(function() {
+      // Waypoints unavailable — map still works without them
+    });
+}
+
+loadWaypoints();
+
 setTimeout(function() {
   document.getElementById('mapLoading').classList.add('hidden');
-  setTimeout(function() {
-    document.getElementById('waypointAlert').classList.add('visible');
-  }, 1200);
 }, 1400);

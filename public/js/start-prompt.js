@@ -128,8 +128,8 @@
       sessionDate: today
     });
     dismiss();
-    if (typeof map !== 'undefined' && map.setView) {
-      map.setView([section.startLat, section.startLng], 14, { animate: true });
+    if (window.equianoMap && window.equianoMap.setView) {
+      window.equianoMap.setView([section.startLat, section.startLng], 14, { animate: true });
     }
   }
 
@@ -164,10 +164,10 @@
         var btn = document.createElement('button');
         btn.className = 'sp-card';
         btn.setAttribute('role', 'listitem');
-        btn.setAttribute('aria-label', section.day + ', ' + section.name + ', ' + section.miles + ' miles');
+        btn.setAttribute('aria-label', section.dayLabel + ', ' + section.name + ', ' + section.miles + ' miles');
         btn.innerHTML =
           '<div class="sp-card-left">' +
-            '<span class="sp-card-day">' + section.day + '</span>' +
+            '<span class="sp-card-day">' + section.dayLabel + '</span>' +
             '<span class="sp-card-name">' + section.name + '</span>' +
           '</div>' +
           '<span class="sp-card-miles">' + section.miles + ' mi</span>';

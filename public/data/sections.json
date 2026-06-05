@@ -1,74 +1,119 @@
 [
   {
     "slug": "day-1-wincobank-whiston",
-    "day": "Day 1",
+    "dayLabel": "Day 1",
     "name": "Wincobank Chapel → Whiston",
     "miles": 7.4,
+    "theme": "Equiano in Sheffield; abolitionist roots at Wincobank Hall",
+    "variant": "main",
+    "sortOrder": 1,
     "startLat": 53.4285,
-    "startLng": -1.3920
+    "startLng": -1.3920,
+    "endLat": 53.4140,
+    "endLng": -1.3010
   },
   {
     "slug": "day-2-whiston-roche-abbey",
-    "day": "Day 2",
+    "dayLabel": "Day 2",
     "name": "Whiston → Roche Abbey",
     "miles": 8.2,
+    "theme": "From industrial suburbs into the quiet of a Cistercian valley",
+    "variant": "main",
+    "sortOrder": 2,
     "startLat": 53.4140,
-    "startLng": -1.3010
+    "startLng": -1.3010,
+    "endLat": 53.4347,
+    "endLng": -1.1548
   },
   {
     "slug": "day-3-roche-abbey-austerfield",
-    "day": "Day 3",
+    "dayLabel": "Day 3",
     "name": "Roche Abbey → Austerfield",
     "miles": 10.9,
-    "startLat": 53.4580,
-    "startLng": -1.2150
+    "theme": "The Pilgrim Fathers — where the search for religious freedom began",
+    "variant": "main",
+    "sortOrder": 3,
+    "startLat": 53.4347,
+    "startLng": -1.1548,
+    "endLat": 53.4694,
+    "endLng": -0.9965
   },
   {
     "slug": "day-4-austerfield-epworth",
-    "day": "Day 4",
+    "dayLabel": "Day 4",
     "name": "Austerfield → Epworth",
     "miles": 13.2,
-    "startLat": 53.4820,
-    "startLng": -1.0520
+    "theme": "John Wesley's country — along waterways to the home of Methodism",
+    "variant": "main",
+    "sortOrder": 4,
+    "startLat": 53.4694,
+    "startLng": -0.9965,
+    "endLat": 53.5267,
+    "endLng": -0.8186
   },
   {
     "slug": "day-5-epworth-scunthorpe",
-    "day": "Day 5",
+    "dayLabel": "Day 5",
     "name": "Epworth → Scunthorpe",
     "miles": 11.1,
-    "startLat": 53.5230,
-    "startLng": -0.9150
+    "theme": "Wesley's villages and Salim C Wilson — freed slave turned evangelist",
+    "variant": "main",
+    "sortOrder": 5,
+    "startLat": 53.5267,
+    "startLng": -0.8186,
+    "endLat": 53.5896,
+    "endLng": -0.6501
   },
   {
     "slug": "day-6a-scunthorpe-south-ferriby",
-    "day": "Day 6a",
+    "dayLabel": "Day 6a",
     "name": "Scunthorpe → South Ferriby",
     "miles": 12.5,
-    "startLat": 53.5880,
-    "startLng": -0.6540
+    "theme": "Through Normanby Hall and along the approach to the vast River Humber",
+    "variant": "main",
+    "sortOrder": 6,
+    "startLat": 53.5896,
+    "startLng": -0.6501,
+    "endLat": 53.7027,
+    "endLng": -0.3916
   },
   {
     "slug": "day-6b-scunthorpe-alkborough",
-    "day": "Day 6b",
+    "dayLabel": "Day 6b",
     "name": "Scunthorpe → Alkborough",
     "miles": 7.7,
-    "startLat": 53.5880,
-    "startLng": -0.6540
+    "theme": "North along the River Trent to Julian's Bower — an ancient turf labyrinth",
+    "variant": "alkborough",
+    "sortOrder": 7,
+    "startLat": 53.5896,
+    "startLng": -0.6501,
+    "endLat": 53.6614,
+    "endLng": -0.4227
   },
   {
     "slug": "day-7b-alkborough-south-ferriby",
-    "day": "Day 7b",
+    "dayLabel": "Day 7b",
     "name": "Alkborough → South Ferriby",
     "miles": 9.3,
-    "startLat": 53.6830,
-    "startLng": -0.6670
+    "theme": "Along the Humber bank past the Roman settlement at Eastfield",
+    "variant": "alkborough",
+    "sortOrder": 8,
+    "startLat": 53.6614,
+    "startLng": -0.4227,
+    "endLat": 53.7027,
+    "endLng": -0.3916
   },
   {
     "slug": "day-7-south-ferriby-hull",
-    "day": "Day 7/8",
+    "dayLabel": "Day 7/8",
     "name": "South Ferriby → Hull",
     "miles": 12.1,
-    "startLat": 53.6710,
-    "startLng": -0.5020
+    "theme": "Across the Humber Bridge to Wilberforce House — journey's end",
+    "variant": "main",
+    "sortOrder": 9,
+    "startLat": 53.7027,
+    "startLng": -0.3916,
+    "endLat": 53.7435,
+    "endLng": -0.3352
   }
 ]

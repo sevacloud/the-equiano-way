@@ -1,0 +1,53 @@
+[
+  {
+    "slug": "wincobank-hall",
+    "sectionSlug": "day-1-wincobank-whiston",
+    "type": "heritage",
+    "title": "Wincobank Hall",
+    "subtitle": "Home of the Sheffield abolitionists",
+    "lat": 53.4245,
+    "lng": -1.3840,
+    "triggerRadiusM": 150,
+    "icon": "✦",
+    "body": "Full story content to be added.",
+    "practicalInfo": {
+      "access": "Public footpath from Wincobank Lane",
+      "terrain": "Paved path, some steps",
+      "facilities": "None at site — shop 0.2mi back on Wincobank Road"
+    }
+  },
+  {
+    "slug": "rother-crossing",
+    "sectionSlug": "day-1-wincobank-whiston",
+    "type": "practical",
+    "title": "River Rother Crossing",
+    "subtitle": "Swing gate on the far bank",
+    "lat": 53.4170,
+    "lng": -1.3590,
+    "triggerRadiusM": 100,
+    "icon": "⟶",
+    "body": "Full story content to be added.",
+    "practicalInfo": {
+      "access": "Kissing gate — may be muddy after rain",
+      "terrain": "Uneven grass, short descent to river",
+      "facilities": "None"
+    }
+  },
+  {
+    "slug": "m1-motorway-crossing",
+    "sectionSlug": "day-1-wincobank-whiston",
+    "type": "practical",
+    "title": "M1 Motorway Crossing",
+    "subtitle": "Footbridge over the M1",
+    "lat": 53.4155,
+    "lng": -1.3380,
+    "triggerRadiusM": 100,
+    "icon": "⟶",
+    "body": "Full story content to be added.",
+    "practicalInfo": {
+      "access": "Signed footbridge — good pavement both sides",
+      "terrain": "Paved, flat",
+      "facilities": "None"
+    }
+  }
+]
