@@ -4,9 +4,11 @@ compatibility_date = "2026-06-05"
 
 [vars]
 STAGE = "production"
+MAP_ENABLED = "false"
 
 [env.preview.vars]
 STAGE = "staging"
+MAP_ENABLED = "false"
 
 [[kv_namespaces]]
 binding = "REPORT_FALLBACK"
